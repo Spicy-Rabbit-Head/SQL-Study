@@ -293,3 +293,58 @@ UPDATE
 SET
     intArr[2] = 4
 RETURNING *;
+
+DROP TABLE IF EXISTS test;
+
+/* 复合类型 */
+CREATE TYPE TESTTYPE AS
+(
+    -- 字段
+    id   INT ,
+    name TEXT
+);
+
+-- 创建复合类型
+CREATE TABLE test
+(
+    -- 复合类型
+    testType TESTTYPE
+);
+
+-- 添加
+INSERT
+INTO
+    test
+VALUES
+    (ROW (1,'a'));
+
+-- 查询
+SELECT
+    (testType).name
+FROM
+    test;
+DROP TABLE IF EXISTS test;
+
+/* RANGE 范围 */
+-- []区间包含起始值及结束值
+-- ()区间不包含起始值及结束值
+-- [)区间包含起始值不包含结束值
+-- (]区间不包含起始值包含结束值
+-- [a,)a和大于a的值
+-- (,a)小于a的值
+
+/* Multirange 多范围 */
+-- Multirange是一组范围的集合
+
+-- 判断是否包含
+SELECT '[1,2]'::INT4RANGE <@ '[0,5]'::INT4RANGE;
+SELECT '[1,9]'::INT4RANGE @> 3;
+-- 判断多范围是否包含
+SELECT '{[1,5],[7,9]}'::INT4MULTIRANGE @> '[2,3]'::INT4RANGE;
+
+-- 自定义范围类型
+CREATE TYPE TSTIME AS RANGE
+(
+    SUBTYPE = TIME
+);
+SELECT TSTIME('10:00','11:00') @> '10:30'::TIME;
