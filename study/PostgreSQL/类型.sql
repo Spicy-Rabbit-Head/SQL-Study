@@ -348,3 +348,64 @@ CREATE TYPE TSTIME AS RANGE
     SUBTYPE = TIME
 );
 SELECT TSTIME('10:00','11:00') @> '10:30'::TIME;
+
+
+/* HSTORE 键值对 */
+-- 启用扩展
+CREATE EXTENSION hstore;
+-- 关闭扩展
+DROP EXTENSION hstore;
+
+-- 创建键值对
+CREATE TABLE test
+(
+    product_name VARCHAR ,
+    -- 键值对
+    hstore       HSTORE
+);
+
+-- 添加键值对
+INSERT
+INTO
+    test(product_name , hstore)
+VALUES
+    ('Computer' , 'CPU=>2.5, Memory=>16G, Disk=>1T');
+-- 查询
+SELECT *
+FROM
+    test;
+-- 查询特定键
+SELECT
+    -- 可以使用->或者[]获取键值
+    hstore -> 'CPU'  AS cpu,
+    hstore['Memory'] AS memory
+FROM
+    test;
+DROP TABLE IF EXISTS test;
+
+/* 域类型 */
+-- 自定义域类型
+CREATE DOMAIN CUSTOM_INT AS INTEGER -- 基于指定类型
+-- 检查约束
+    CHECK (VALUE > 18);
+-- 创建表
+CREATE TABLE test
+(
+    -- 自定义域类型
+    age CUSTOM_INT
+);
+
+INSERT
+INTO
+    test
+VALUES
+    -- 小于18会报错
+    -- 必须通过自定义域类型的检查约束
+    (20);
+DROP TABLE IF EXISTS test;
+
+
+
+
+
+

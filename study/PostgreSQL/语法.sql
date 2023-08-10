@@ -930,4 +930,139 @@ SELECT *
 FROM
     cte_categories;
 
+/* 聚合函数 */
+-- MAX 最大值
+SELECT
+    MAX(age)
+FROM
+    users;
 
+/* 视图 */
+-- 根据查询语句创建的虚拟表
+-- 创建视图
+CREATE VIEW users_string
+AS
+SELECT
+    id,
+    name,
+    age::VARCHAR AS age
+FROM
+    users;
+
+-- 查询视图
+SELECT *
+FROM
+    users_string;
+
+-- 删除视图
+DROP VIEW users_string;
+
+/* 继承 */
+-- 创建表
+CREATE TABLE capital
+(
+    name       TEXT ,
+    population REAL ,
+    elevation  INT
+);
+
+-- 创建继承表
+CREATE TABLE capitals
+(
+    state TEXT
+) INHERITS ( capital );
+-- INHERITS子句指定了继承的父表
+
+-- 插入数据
+-- 查询父表，可以看到子表的数据
+-- 查询子表，只能看到子表的数据
+INSERT
+INTO
+    capital
+VALUES
+    ('武汉' , 1000 , 100);
+
+SELECT *
+FROM
+    capital;
+DROP TABLE capital;
+DROP TABLE capitals;
+
+/* 数据库管理 */
+/* 查询数据库 */
+SELECT *
+FROM
+    pg_database;
+
+/* 数据库复制 */
+CREATE DATABASE testdb
+    WITH TEMPLATE = study;
+
+DROP DATABASE testdb;
+
+/* 获取数据库大小 */
+SELECT
+    PG_SIZE_PRETTY(PG_DATABASE_SIZE('study'));
+SELECT
+    datname,
+    PG_SIZE_PRETTY(PG_DATABASE_SIZE(datname)) AS size
+FROM
+    pg_database;
+
+/* 获取数据库表大小 */
+SELECT
+    -- 不包含索引
+    PG_SIZE_PRETTY(PG_RELATION_SIZE('users'));
+
+SELECT
+    -- 包含索引
+    PG_SIZE_PRETTY(PG_TOTAL_RELATION_SIZE('users'));
+SELECT
+    tablename,
+    PG_SIZE_PRETTY(PG_TOTAL_RELATION_SIZE('users')) AS size
+FROM
+    pg_tables
+WHERE
+    schemaname = 'public';
+
+/* 获取数据库索引大小 */
+SELECT
+    PG_SIZE_PRETTY(PG_INDEXES_SIZE('users'));
+
+/* 获取表空间大小 */
+SELECT
+    PG_SIZE_PRETTY(PG_TABLESPACE_SIZE('pg_default'));
+
+/* 获取值大小 */
+SELECT PG_COLUMN_SIZE('hello');
+
+/* 复制表 */
+CREATE TABLE users_copy
+AS
+SELECT *
+FROM
+    users;
+
+/* 修改密码 */
+ALTER USER postgres WITH PASSWORD '123456';
+
+/* 创建索引 */
+CREATE INDEX users_name_index
+    ON users USING BTREE ( name DESC NULLS LAST );
+
+/* 多列索引 */
+CREATE INDEX users_name_age_index
+    ON users USING BTREE ( name , age );
+
+SELECT *
+FROM
+    users
+WHERE
+    name = '张三';
+/* 删除索引 */
+DROP INDEX IF EXISTS users_name_index;
+
+/* 查看索引 */
+SELECT *
+FROM
+    pg_indexes;
