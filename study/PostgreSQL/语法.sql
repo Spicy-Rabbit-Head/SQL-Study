@@ -1043,26 +1043,176 @@ SELECT *
 FROM
     users;
 
-/* 修改密码 */
-ALTER USER postgres WITH PASSWORD '123456';
+/* 创建角色 */
+CREATE ROLE test WITH -- 角色名
+--SUPERUSER 指定是创建用户
+    NOSUPERUSER -- 指定不是超级用户
+-- CREATEDB 指定可创建数据库
+    NOCREATEDB -- 指定不可创建数据库
+-- CREATEROLE 指定可创建角色
+    NOCREATEROLE -- 指定不可创建角色
+-- INHERIT 继承所属角色的特权
+    NOINHERIT -- 不继承所属角色的特权
+-- NOLOGIN 不允许角色登录
+    LOGIN -- 允许角色登录
+-- REPLICATION -- 指定为复制角色
+    NOREPLICATION -- 指定不为复制角色
+-- BYPASSRLS 绕过级别安全性策略
+    NOBYPASSRLS -- 不绕过级别安全性策略
+    CONNECTION LIMIT 10 -- 连接并发数限制
+    ENCRYPTED PASSWORD '666666' -- 设定加密密码或指定NULL
+    VALID UNTIL '2023.8.12 22:15:12' -- 指定密码有效期
+;
+
+SELECT *
+FROM
+    pg_roles;
+
+/* 创建用户 */
+-- 等效于创建角色
+CREATE USER test LOGIN PASSWORD '123456';
+
+/* 修改角色 */
+ALTER ROLE test PASSWORD '111111';
+
+/* 删除角色 */
+DROP ROLE test;
+
+/* 授权 */
+-- 授权查询权限
+GRANT SELECT
+    ON users TO test;
+
+/* 撤销 */
+REVOKE SELECT ON users FROM test;
+
+/* 创建角色组 */
+CREATE ROLE father
+    WITH
+    LOGIN
+    NOSUPERUSER
+    NOCREATEDB
+    NOCREATEROLE
+    NOINHERIT
+    PASSWORD '123123';
+/* 授权角色组相关权限 */
+GRANT CONNECT ON DATABASE
+    study TO father;
+
+/* 创建成员角色 */
+CREATE ROLE son2
+    WITH
+    NOSUPERUSER
+    NOCREATEDB
+    NOCREATEROLE
+    INHERIT
+    PASSWORD '119246'
+    ROLE father;
+
+/* 继承角色组 */
+GRANT father TO son1;
+
+/* EXPLAIN 执行计划 */
+-- EXPLAIN 用来显示查询的执行计划
+-- 选项
+-- ANALYZE 实际允许时间和统计信息
+-- VERBOSE 显示更多信息
+-- COSTS 每个节点的成本估算,行数和宽度估算
+-- SETTINGS 有关配置参数的信息
+-- BUFFERS 每个节点的缓冲区使用情况
+-- WAL 显示 WAL 使用情况,必须和 ANALYZE 一起使用
+-- TIMING 显示每个节点的实际执行时间,必须和 ANALYZE 同时使用
+-- SUMMARY 查询计划之后包括摘要信息
+-- FORMAT 指定输出格式(TEXT,JSON,YAML,XML)
+EXPLAIN (ANALYZE )
+SELECT *
+FROM
+    users;
+
+
+/* 索引 */
+-- 索引用来提高查询效率
+-- 索引参数表
+CREATE TABLE test
+(
+    id   INTEGER ,
+    name TEXT
+);
+-- 插入1千万条数据
+INSERT
+INTO
+    test
+SELECT
+    v,
+    'val:' || v
+FROM
+    GENERATE_SERIES(1,10000000) v;
+
+-- 无索引查询
+EXPLAIN ANALYZE
+SELECT *
+FROM
+    test
+WHERE
+    id = 1000;
 
 /* 创建索引 */
-CREATE INDEX users_name_index
-    ON users USING BTREE ( name DESC NULLS LAST );
+CREATE INDEX test_id_index
+    ON test ( id );
+
+-- 默认BTREE索引查询
+EXPLAIN ANALYZE
+SELECT *
+FROM
+    test
+WHERE
+    id = 1000000;
+
+/* 创建非默认索引 */
+CREATE INDEX test_id_index
+    -- USING 指定索引类型
+    ON test USING HASH ( id DESC NULLS LAST );
 
 /* 多列索引 */
-CREATE INDEX users_name_age_index
-    ON users USING BTREE ( name , age );
+CREATE INDEX test_id_name_index
+    ON test USING BTREE ( id , name );
 
+EXPLAIN ANALYZE
 SELECT *
 FROM
     users
 WHERE
-    name = '张三';
+    id = 1000000 AND
+    name = 'val:1000000';
+
 /* 删除索引 */
-DROP INDEX IF EXISTS users_name_index;
+DROP INDEX IF EXISTS test_id_name_index;
 
 /* 查看索引 */
 SELECT *
 FROM
     pg_indexes;
+
+/* 唯一索引 */
+-- 确保列的值是唯一的
+CREATE UNIQUE INDEX test_id_index
+    ON test USING BTREE ( id );
+
+EXPLAIN ANALYZE
+SELECT *
+FROM
+    users;
+DROP INDEX IF EXISTS test_id_index;
+
+/* 函数索引 */
+CREATE INDEX test_id_index
+    ON test ( UPPER(name) );
+
+EXPLAIN ANALYZE
+SELECT *
+FROM
+    test
+WHERE
+    UPPER(name) = 'VAL:1000000';
+DROP INDEX IF EXISTS test_id_index;
+
