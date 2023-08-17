@@ -487,36 +487,6 @@ WHERE
             id > 5 OR
             name = '张三';
 
--- 过滤条件可以使用 IN 和 NOT IN 连接
-SELECT *
-FROM
-    users
-WHERE
-    -- 匹配查询
-    name IN ( '张三' , '李四' );
-SELECT *
-FROM
-    users
-WHERE
-    -- 排除查询
-    name NOT IN ('张三');
-
--- LIKE 模糊查询
--- % 任意字符
--- _ 单个字符
-SELECT *
-FROM
-    users
-WHERE
-    name LIKE '%三';
-
--- BETWEEN 区间查询
-SELECT *
-FROM
-    users
-WHERE
-    id BETWEEN 2 AND 3;
-
 /* 排序 */
 SELECT *
 FROM
@@ -678,6 +648,7 @@ WHERE
     id NOT BETWEEN 2 AND 6;
 
 /* LIKE 模糊查询 */
+-- % 任意字符
 SELECT *
 FROM
     users
@@ -701,6 +672,8 @@ FROM
     users
 WHERE
     name ILIKE '%三';
+-- ESCAPE 转义字符
+-- ESCAPE '#' 表示 # 后面的字符不作为通配符
 
 /* IS NULL 空值 */
 SELECT *
@@ -729,6 +702,7 @@ SELECT
 
 /* ANY 比较任意值(任一满足) */
 SELECT 2 = ANY (ARRAY [ 1 , 2 , 3 ]) AS result;
+
 -- 比较子查询任意值
 SELECT
         22 > ANY (
@@ -771,7 +745,7 @@ ORDER BY
     name,
     age;
 
-/* CUBE 多维分组集合 */
+/* CUBE 多维分组笛卡尔积 */
 SELECT
     name,
     age,
@@ -788,6 +762,44 @@ ORDER BY
     age;
 
 /* JOIN 连接 */
+-- 连接用数据
+CREATE TABLE student
+(
+    -- 学生ID
+    student_id INTEGER     NOT NULL ,
+    -- 姓名
+    name       VARCHAR(45) NOT NULL ,
+    PRIMARY KEY ( student_id )
+);
+
+CREATE TABLE student_score
+(
+    -- 学生ID
+    student_id INTEGER     NOT NULL ,
+    -- 科目
+    subject    VARCHAR(45) NOT NULL ,
+    -- 得分
+    score      INTEGER     NOT NULL
+);
+INSERT
+INTO
+    student
+    (student_id , name)
+VALUES
+    (1 , 'Tim'),
+    (2 , 'Jim'),
+    (3 , 'Lucy');
+
+INSERT
+INTO
+    student_score
+    (student_id , subject , score)
+VALUES
+    (1 , 'English' , 90),
+    (1 , 'Math' , 80),
+    (2 , 'English' , 85),
+    (5 , 'English' , 92);
+
 -- CROSS 交叉连接
 -- 返回两个集合的笛卡尔积
 -- 返回所有可能的组合
@@ -848,7 +860,7 @@ FROM
     FULL JOIN student_score
     USING ( student_id );
 
-/* UNION 合并查询 */
+/* UNION 并集查询 */
 -- 返回两个集合的并集
 SELECT *
 FROM
@@ -987,6 +999,17 @@ FROM
     capital;
 DROP TABLE capital;
 DROP TABLE capitals;
+
+/* 窗口函数 */
+-- 针对每一行数据,基于和它相关的一组数据计算出结果
+SELECT
+    id,
+    name,
+    age,
+    -- 添加 OVER关键字 指定为窗口函数
+    AVG(age) OVER () AS sum_age
+FROM
+    users;
 
 /* 数据库管理 */
 /* 查询数据库 */
