@@ -133,9 +133,10 @@ CREATE TABLE users
 (
     -- PRIMARY KEY 主键约束
     -- 主键列的值必须是唯一的,且不能为 NULL
-    id   INTEGER PRIMARY KEY ,
-    name VARCHAR(30) ,
-    age  INT NOT NULL
+    id       INTEGER PRIMARY KEY ,
+    name     VARCHAR(30) ,
+    age      INT NOT NULL ,
+    grouping INT NOT NULL
 );
 -- 定义主键-多列
 CREATE TABLE users
@@ -1010,6 +1011,51 @@ SELECT
     AVG(age) OVER () AS sum_age
 FROM
     users;
+-- 分组窗口函数
+SELECT
+    id,
+    name,
+    age,
+    grouping,
+    -- 根据分组计算
+    AVG(age) OVER (PARTITION BY grouping) AS sum_age
+FROM
+    users;
+-- 排序窗口函数
+SELECT
+    id,
+    name,
+    age,
+    grouping,
+    -- 根据排序计算
+    RANK() OVER (PARTITION BY grouping ORDER BY age DESC) AS rank
+FROM
+    users;
+-- 窗口分区
+SELECT
+    id,
+    name,
+    age,
+    grouping,
+    -- 根据窗口分区计算
+    AVG(age) OVER (PARTITION BY grouping ORDER BY age DESC ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS sum_age
+-- ROWS : 以行为单位计算窗口的偏移量
+-- RANGE : 以值为单位计算窗口的偏移量
+-- BETWEEN N PRECEDING AND N FOLLOWING : 从当前行的前 N 行到后 N 行
+FROM
+    users;
+-- 定义窗口
+SELECT
+    id,
+    name,
+    age,
+    grouping,
+    -- 定义窗口
+    AVG(age) OVER w AS sum_age
+FROM
+    users
+-- 定义
+WINDOW w AS ( PARTITION BY grouping ORDER BY age DESC);
 
 /* 数据库管理 */
 /* 查询数据库 */
