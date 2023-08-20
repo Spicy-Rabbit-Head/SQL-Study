@@ -1,3 +1,240 @@
+/* 字符类型 */
+CREATE TABLE type_char
+(
+    -- 插入是超出的是空白不会报错,会自动截断
+    -- 插入是未满的会自动补空白
+    char    CHAR(1) ,
+    -- 插入是超出的会报错
+    -- 插入是未满会自动改变长度
+    varchar VARCHAR(10) ,
+    -- 无限制字符串
+    text    TEXT
+);
+
+-- 插入
+INSERT
+INTO
+    type_char
+VALUES
+    ('a' , 'b' , 'c');
+
+/* 数值类型 */
+-- 整数类型
+CREATE TABLE type_integer
+(
+    -- 短整型
+    smallint SMALLINT ,
+    -- 整型
+    integer  INTEGER ,
+    -- 长整型
+    bigint   BIGINT
+);
+
+-- 插入
+INSERT
+INTO
+    type_integer
+VALUES
+    (1 , 2 , 3);
+
+-- 任意精度的浮点数
+CREATE TABLE type_decimal
+(
+    -- 指定精度的浮点数
+    decimal DECIMAL(10 , 2) ,
+    numeric NUMERIC(10 , 2)
+);
+
+-- 插入
+INSERT
+INTO
+    type_decimal
+VALUES
+    (1.23 , 4.56);
+
+-- 串行类型
+CREATE TABLE type_serial
+(
+    -- 自增长的短整型
+    smallserial SMALLSERIAL ,
+    -- 自增长的整型
+    serial      SERIAL ,
+    -- 自增长的长整型
+    bigserial   BIGSERIAL
+);
+
+-- 插入
+INSERT
+INTO
+    type_serial
+    DEFAULT
+VALUES;
+
+-- 浮点类型
+CREATE TABLE type_float
+(
+    -- 单精度浮点数
+    real  REAL ,
+    -- 双精度浮点数
+    float FLOAT
+);
+
+-- 插入
+INSERT
+INTO
+    type_float
+VALUES
+    (1.23 , 4.56);
+
+/* 布尔类型 */
+CREATE TABLE type_boolean
+(
+    -- 布尔类型
+    boolean BOOLEAN
+);
+
+-- 插入
+INSERT
+INTO
+    type_boolean
+VALUES
+    (TRUE),
+    ('t');
+
+/* 日期和时间类型 */
+-- 日期类型
+CREATE TABLE type_date
+(
+    -- 日期类型
+    -- 公元前 4713年到公元 5874897年
+    -- 必须保证数据以 yyyy-mm-dd 格式存储
+    date DATE
+);
+
+-- 插入
+INSERT
+INTO
+    type_date
+VALUES
+    ('2020-01-01');
+
+-- 时间类型
+CREATE TABLE type_time
+(
+    -- 时间类型,无时区
+    -- 00:00:00 到 24:00:00
+    -- 数据以 HH:MI:SS.ssssss 格式存储
+    -- 时:分:秒.毫秒
+    time      TIME ,
+    -- 时间类型,有时区
+    -- 00:00:00+1559 到 24:00:00-1559
+    time_zone TIME WITH TIME ZONE
+);
+
+-- 插入
+INSERT
+INTO
+    type_time
+VALUES
+    ('00:00:00' , '00:00:00+1559');
+
+-- 时间戳类型
+CREATE TABLE type_timestamp
+(
+    -- 时间戳类型,无时区
+    -- 公元前 4713年到公元 294276年
+    -- 数据以 yyyy-mm-dd HH:MI:SS.ssssss 格式存储
+    -- 年-月-日 时:分:秒.毫秒
+    timestamp      TIMESTAMP ,
+    -- 时间戳类型,有时区
+    -- 公元前 4713年到公元 294276年
+    -- 数据以 yyyy-mm-dd HH:MI:SS.ssssss 格式存储
+    -- 年-月-日 时:分:秒.毫秒
+    -- 时区
+    timestamp_zone TIMESTAMP WITH TIME ZONE
+);
+
+-- 插入
+INSERT
+INTO
+    type_timestamp
+VALUES
+    ('2020-01-01 00:00:00' , '2020-01-01 00:00:00+1559');
+
+-- 时间间隔类型
+CREATE TABLE type_interval
+(
+    -- 时间间隔类型
+    -- 无时区
+    -- 数据以 HH:MI:SS.ssssss 格式存储
+    -- 时:分:秒.毫秒
+    interval INTERVAL
+);
+
+-- 插入
+INSERT
+INTO
+    type_interval
+VALUES
+    ('00:00:00');
+
+/* 货币类型 */
+CREATE TABLE type_money
+(
+    -- 货币类型
+    money MONEY
+);
+
+-- 插入
+INSERT
+INTO
+    type_money
+VALUES
+    ('$1.23');
+
+/* 二进制数据类型 */
+CREATE TABLE type_binary
+(
+    -- 二进制数据类型
+    bytea BYTEA
+);
+
+-- 插入
+INSERT
+INTO
+    type_binary
+VALUES
+    ('123');
+
+/* 枚举类型 */
+-- 声明枚举类型
+CREATE TYPE WEEK AS ENUM (
+    -- 枚举值
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday'
+    );
+
+-- 使用枚举类型
+CREATE TABLE type_enum
+(
+    -- 枚举类型
+    -- 插入非枚举值会报错
+    -- 枚举排序规则就是枚举声明时的顺序
+    week WEEK
+);
+
+-- 插入
+INSERT
+INTO
+    type_enum
+VALUES
+    ('Monday');
+
 /* POINT 二维点 */
 CREATE TABLE test
 (
