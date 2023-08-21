@@ -235,8 +235,52 @@ INTO
 VALUES
     ('Monday');
 
+
+/* JSON类型 */
+CREATE TABLE type_json
+(
+    json JSON
+);
+
+-- 插入
+INSERT
+INTO
+    type_json
+VALUES
+    ('{
+      "id": 1,
+      "name": "张三",
+      "address": {
+        "city": "北京",
+        "street": "朝阳区"
+      }
+    }'),
+    ('{
+      "id": 2,
+      "name": "李四",
+      "address": {
+        "city": "宁波",
+        "street": "鄞州区"
+      }
+    }');
+
+-- 操作符查询
+SELECT
+    -- 使用操作符
+    -- -> 获取 json 字段的值
+    json -> 'id'                 AS id,
+    -- ->> 获取 json 字段的值文本
+    json ->> 'name'              AS name,
+    -- 多级
+    json -> 'address' ->> 'city' AS city,
+    -- 指定路径的值
+    json #>> '{address,street}'  AS street
+FROM
+    type_json;
+
+/* 几何类型 */
 /* POINT 二维点 */
-CREATE TABLE test
+CREATE TABLE type_point
 (
     -- 基本二维构建块
     point POINT
@@ -245,14 +289,14 @@ CREATE TABLE test
 -- 创建点
 INSERT
 INTO
-    test
+    type_point
 VALUES
     (POINT(1,2));
 
 -- 创建点
 INSERT
 INTO
-    test
+    type_point
 VALUES
     -- x和y为各自坐标
     -- 未浮点数
@@ -260,12 +304,11 @@ VALUES
 
 SELECT *
 FROM
-    test;
-DROP TABLE IF EXISTS test;
+    type_point;
 
 
 /* LINE 线 */
-CREATE TABLE test
+CREATE TABLE type_line
 (
     -- 无限长的线
     line LINE
@@ -274,14 +317,14 @@ CREATE TABLE test
 -- 创建线
 INSERT
 INTO
-    test
+    type_line
 VALUES
     (LINE(POINT(1,2),POINT(3,4)));
 
 -- 创建线
 INSERT
 INTO
-    test
+    type_line
 VALUES
     -- {A,B,C}式输入
     ('{1,5,1}'),
@@ -290,11 +333,10 @@ VALUES
 
 SELECT *
 FROM
-    test;
-DROP TABLE IF EXISTS test;
+    type_line;
 
 /* LINESTRING 线段 */
-CREATE TABLE test
+CREATE TABLE type_lseg
 (
     -- 有限长的线段
     lseg LSEG
@@ -303,14 +345,14 @@ CREATE TABLE test
 -- 创建线段
 INSERT
 INTO
-    test
+    type_lseg
 VALUES
     (LSEG(POINT(1,2),POINT(3,4)));
 
 -- 创建线段
 INSERT
 INTO
-    test
+    type_lseg
 VALUES
     -- [(x1,y1),(x2,y2)]式或
     -- ((x1,y1),(x2,y2))式输入
@@ -318,11 +360,10 @@ VALUES
 
 SELECT *
 FROM
-    test;
-DROP TABLE IF EXISTS test;
+    type_lseg;
 
 /* BOX 矩形 */
-CREATE TABLE test
+CREATE TABLE type_box
 (
     -- 矩形框
     box BOX
@@ -331,14 +372,14 @@ CREATE TABLE test
 -- 创建矩形
 INSERT
 INTO
-    test
+    type_box
 VALUES
     (BOX(POINT(1,2),POINT(3,4)));
 
 -- 创建矩形
 INSERT
 INTO
-    test
+    type_box
 VALUES
     -- [(x1,y1),(x2,y2)]式
     ('((0,0),(1,1))');
@@ -346,11 +387,10 @@ VALUES
 
 SELECT *
 FROM
-    test;
-DROP TABLE IF EXISTS test;
+    type_box;
 
 /* PATH 路径 */
-CREATE TABLE test
+CREATE TABLE type_path
 (
     -- 路径
     path PATH
@@ -359,7 +399,7 @@ CREATE TABLE test
 -- 创建路径
 INSERT
 INTO
-    test
+    type_path
 VALUES
     -- [(x1,y1),(x2,y2)]式或
     -- ((x1,y1),(x2,y2))式输入
@@ -368,11 +408,10 @@ VALUES
 
 SELECT *
 FROM
-    test;
-DROP TABLE IF EXISTS test;
+    type_path;
 
 /* POLYGON 多边形 */
-CREATE TABLE test
+CREATE TABLE type_polygon
 (
     -- 多边形
     polygon POLYGON
@@ -381,18 +420,17 @@ CREATE TABLE test
 -- 创建多边形
 INSERT
 INTO
-    test
+    type_polygon
 VALUES
     -- ((x1,y1),(xn,yn))式输入
     ('((1,2),(3,4))');
 
 SELECT *
 FROM
-    test;
-DROP TABLE IF EXISTS test;
+    type_polygon;
 
 /* CIRCLE 圆 */
-CREATE TABLE test
+CREATE TABLE type_circle
 (
     -- 圆
     circle CIRCLE
@@ -401,7 +439,7 @@ CREATE TABLE test
 -- 创建圆
 INSERT
 INTO
-    test
+    type_circle
 VALUES
     -- <(x,y),r>式或
     -- ((x,y),r)式输入
@@ -409,11 +447,10 @@ VALUES
 
 SELECT *
 FROM
-    test;
-DROP TABLE IF EXISTS test;
+    type_circle;
 
 /* CIDR 网络地址 */
-CREATE TABLE test
+CREATE TABLE type_network_address
 (
     -- 网络地址
     cidr     CIDR ,
@@ -428,7 +465,7 @@ CREATE TABLE test
 -- 创建网络地址
 INSERT
 INTO
-    test
+    type_network_address
     (cidr , inet , macaddr , macaddr8)
 VALUES
     -- x.x.x.x/y式输入
@@ -437,11 +474,10 @@ VALUES
 
 SELECT *
 FROM
-    test;
-DROP TABLE IF EXISTS test;
+    type_network_address;
 
 /* TSVECTOR 文本搜索向量 */
-CREATE TABLE test
+CREATE TABLE type_tsvector
 (
     -- 文本搜索向量
     text TSVECTOR ,
@@ -452,33 +488,29 @@ CREATE TABLE test
 -- 创建文本搜索向量
 INSERT
 INTO
-    test
+    type_tsvector
     (text , ts)
 VALUES
     ('a fat cat sat on a mat and ate a fat rat' , 'rat');
 
 SELECT *
 FROM
-    test
+    type_tsvector
 WHERE
-    test.text @@ TO_TSQUERY('rat');
-
-DROP TABLE IF EXISTS test;
+    type_tsvector.text @@ TO_TSQUERY('rat');
 
 /* UUID 通用唯一标识符 */
 -- 生成UUID
 SELECT gen_random_uuid();
 
-CREATE TABLE test
+CREATE TABLE type_uuid
 (
     -- 通用唯一标识符
     uuid UUID DEFAULT gen_random_uuid() PRIMARY KEY
 );
 
-DROP TABLE IF EXISTS test;
-
 /* XML 类型 */
-CREATE TABLE test
+CREATE TABLE type_xml
 (
     -- XML类型
     xml XML
@@ -487,14 +519,15 @@ CREATE TABLE test
 -- 创建XML类型
 INSERT
 INTO
-    test
+    type_xml
 VALUES
-    ('<a>123</a>');
+    ('
+    <a>123</a>
+    ');
 
 SELECT *
 FROM
-    test;
-DROP TABLE IF EXISTS test;
+    type_xml;
 
 /* ARRAY 数组 */
 -- TYPE[]的形式创建
@@ -502,39 +535,44 @@ DROP TABLE IF EXISTS test;
 SELECT ARRAY [1,2,3];
 -- 创建数组
 SELECT '{1,2,3}'::INT[];
-CREATE TABLE test
+
+CREATE TABLE type_array
 (
     -- 数组
     intArr INT[]
 );
+
+-- 插入
 INSERT
 INTO
-    test
+    type_array
 VALUES
     ('{1,2,3}');
+
 -- 数组索引
 SELECT
     intArr[1]
 FROM
-    test;
+    type_array;
+
 -- 数组搜索
 SELECT
     intArr
 FROM
-    test
+    type_array
 WHERE
     1 = ANY (intArr);
+
 -- 数组修改
 UPDATE
-    test
+    type_array
 SET
     intArr[2] = 4
 RETURNING *;
 
-DROP TABLE IF EXISTS test;
 
 /* 复合类型 */
-CREATE TYPE TESTTYPE AS
+CREATE TYPE COMPOSITE AS
 (
     -- 字段
     id   INT ,
@@ -542,16 +580,16 @@ CREATE TYPE TESTTYPE AS
 );
 
 -- 创建复合类型
-CREATE TABLE test
+CREATE TABLE type_composite
 (
     -- 复合类型
-    testType TESTTYPE
+    testType COMPOSITE
 );
 
 -- 添加
 INSERT
 INTO
-    test
+    type_composite
 VALUES
     (ROW (1,'a'));
 
@@ -559,8 +597,7 @@ VALUES
 SELECT
     (testType).name
 FROM
-    test;
-DROP TABLE IF EXISTS test;
+    type_composite;
 
 /* RANGE 范围 */
 -- []区间包含起始值及结束值
@@ -571,7 +608,7 @@ DROP TABLE IF EXISTS test;
 -- (,a)小于a的值
 
 /* Multirange 多范围 */
--- Multirange是一组范围的集合
+-- Multirange 是一组范围的集合
 
 -- 判断是否包含
 SELECT '[1,2]'::INT4RANGE <@ '[0,5]'::INT4RANGE;
@@ -580,11 +617,12 @@ SELECT '[1,9]'::INT4RANGE @> 3;
 SELECT '{[1,5],[7,9]}'::INT4MULTIRANGE @> '[2,3]'::INT4RANGE;
 
 -- 自定义范围类型
-CREATE TYPE TSTIME AS RANGE
+CREATE TYPE MY_RANGE AS RANGE
 (
     SUBTYPE = TIME
 );
-SELECT TSTIME('10:00','11:00') @> '10:30'::TIME;
+
+SELECT MY_RANGE('10:00','11:00') @> '10:30'::TIME;
 
 
 /* HSTORE 键值对 */
@@ -594,7 +632,7 @@ CREATE EXTENSION hstore;
 DROP EXTENSION hstore;
 
 -- 创建键值对
-CREATE TABLE test
+CREATE TABLE type_hstore
 (
     product_name VARCHAR ,
     -- 键值对
@@ -604,42 +642,43 @@ CREATE TABLE test
 -- 添加键值对
 INSERT
 INTO
-    test(product_name , hstore)
+    type_hstore(product_name , hstore)
 VALUES
     ('Computer' , 'CPU=>2.5, Memory=>16G, Disk=>1T');
+
 -- 查询
 SELECT *
 FROM
-    test;
+    type_hstore;
+
 -- 查询特定键
 SELECT
     -- 可以使用->或者[]获取键值
     hstore -> 'CPU'  AS cpu,
     hstore['Memory'] AS memory
 FROM
-    test;
-DROP TABLE IF EXISTS test;
+    type_hstore;
 
 /* 域类型 */
 -- 自定义域类型
-CREATE DOMAIN CUSTOM_INT AS INTEGER -- 基于指定类型
+CREATE DOMAIN DOMAIN_INT AS INTEGER -- 基于指定类型
 -- 检查约束
     CHECK (VALUE > 18);
+
 -- 创建表
-CREATE TABLE test
+CREATE TABLE type_domain
 (
     -- 自定义域类型
-    age CUSTOM_INT
+    age DOMAIN_INT
 );
 
 INSERT
 INTO
-    test
+    type_domain
 VALUES
     -- 小于18会报错
     -- 必须通过自定义域类型的检查约束
     (20);
-DROP TABLE IF EXISTS test;
 
 
 
