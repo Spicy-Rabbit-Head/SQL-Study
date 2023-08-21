@@ -612,6 +612,7 @@ FROM
 
 -- 判断是否包含
 SELECT '[1,2]'::INT4RANGE <@ '[0,5]'::INT4RANGE;
+
 SELECT '[1,9]'::INT4RANGE @> 3;
 -- 判断多范围是否包含
 SELECT '{[1,5],[7,9]}'::INT4MULTIRANGE @> '[2,3]'::INT4RANGE;
@@ -679,9 +680,3 @@ VALUES
     -- 小于18会报错
     -- 必须通过自定义域类型的检查约束
     (20);
-
-
-
-
-
-

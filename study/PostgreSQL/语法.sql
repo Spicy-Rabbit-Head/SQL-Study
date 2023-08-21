@@ -8,10 +8,10 @@
 
 /* DDL 数据定义语言 */
 /* 创建数据库 */
-CREATE DATABASE test;
+CREATE DATABASE my_data_no_parameters;
 
 /* 创建数据库-可选参数 */
-CREATE DATABASE test
+CREATE DATABASE my_data_parameters
     WITH
     -- 指定数据库所有者
     OWNER = postgres
@@ -22,9 +22,9 @@ CREATE DATABASE test
     -- 指定数据库区域的快捷方式
     -- LOCALE = 'zh_CN.utf8'
     -- 指定数据库的整理规则
-    LC_COLLATE = 'zh_CN.utf8'
+    LC_COLLATE = 'C'
     -- 指定数据库的字符分类
-    LC_CTYPE = 'zh_CN.utf8'
+    LC_CTYPE = 'C'
     -- 将与新数据库关联的表空间
     -- TABLESPACE = pg_default
     -- 是否允许连接到该数据库
@@ -35,22 +35,25 @@ CREATE DATABASE test
     IS_TEMPLATE = FALSE;
 
 /* 删除数据库 */
-DROP DATABASE test;
+DROP DATABASE my_data_no_parameters;
+DROP DATABASE my_data_parameters;
 
 /* 删除数据库-可选参数 */
 -- 判断数据库是否存在，存在则删除
-DROP DATABASE IF EXISTS test;
+DROP DATABASE IF EXISTS my_data_no_parameters;
 
+CREATE DATABASE test;
 /* 修改数据库 */
-ALTER DATABASE test RENAME TO text;
+ALTER DATABASE test RENAME TO test_alter;
 -- 所有者
-ALTER DATABASE test OWNER TO postgres;
+ALTER DATABASE test_alter OWNER TO postgres;
 -- 连接数限制
-ALTER DATABASE test CONNECTION LIMIT 10;
+ALTER DATABASE test_alter CONNECTION LIMIT 10;
 -- 配置
-ALTER DATABASE test SET 配置名 TO '配置值';
+ALTER DATABASE test_alter SET 配置名 TO '配置值';
 -- 重置配置
-ALTER DATABASE test RESET ALL;
+ALTER DATABASE test_alter RESET ALL;
+DROP DATABASE test_alter;
 
 /* 创建表 */
 CREATE TABLE IF NOT EXISTS customer -- 表名
@@ -72,14 +75,14 @@ CREATE TABLE IF NOT EXISTS customer -- 表名
 -- IDENTIFY_COLUMN —— 标识列约束
 
 /* 创建表-模版创建 */
-CREATE TABLE IF NOT EXISTS customer_test
+CREATE TABLE customer_template
     -- 指定模版表
 AS TABLE customer
     -- WITH NO DATA 表示不复制数据
     WITH NO DATA;
 
 /* 创建表-结果集 */
-CREATE TABLE IF NOT EXISTS customer_test
+CREATE TABLE IF NOT EXISTS customer_result_set
     -- 指定结果集
 AS
 SELECT * -- 指定复制列
@@ -89,47 +92,61 @@ FROM
 /* 删除表 */
 -- IF EXISTS 判断表是否存在，存在则删除
 DROP TABLE IF EXISTS customer;
+DROP TABLE IF EXISTS customer_template;
+DROP TABLE IF EXISTS customer_result_set;
 -- 参数
 -- CASCADE —— 删除表的同时删除依赖于该表的其他对象
 -- RESTRICT —— 如果其他对象依赖于该表，则不删除该表
 
 /* 修改表 */
+CREATE TABLE modification_list
+(
+    id INT
+);
+
 -- 修改表名
-ALTER TABLE customer
-    RENAME TO customer_test;
+ALTER TABLE modification_list
+    RENAME TO modification_list_alter;
+
 -- 修改表架构
-ALTER TABLE customer
+ALTER TABLE modification_list_alter
     SET SCHEMA postgres.public;
+
 -- 添加列
-ALTER TABLE customer
+ALTER TABLE modification_list_alter
     ADD COLUMN IF NOT EXISTS
-        customer_id VARCHAR(10);
+        name VARCHAR(10);
+
 -- 修改列类型
-ALTER TABLE customer
-    ALTER COLUMN customer_id
+ALTER TABLE modification_list_alter
+    ALTER COLUMN name
         -- SET DATA 指定新的排序规则
-        SET DATA TYPE VARCHAR(10);
+        SET DATA TYPE TEXT;
+
 -- 设置非空约束
-ALTER TABLE customer
-    ALTER COLUMN customer_id
+ALTER TABLE modification_list_alter
+    ALTER COLUMN id
         SET NOT NULL;
+
 -- 删除非空约束
-ALTER TABLE customer
-    ALTER COLUMN customer_id
+ALTER TABLE modification_list_alter
+    ALTER COLUMN id
         DROP NOT NULL;
+
 -- 添加约束
-ALTER TABLE customer
+ALTER TABLE modification_list_alter
     -- 添加主键约束
-    ADD CONSTRAINT customer_pkey
-        PRIMARY KEY ( customer_id );
+    ADD CONSTRAINT id_primary
+        PRIMARY KEY ( id );
+
 -- 删除约束
-ALTER TABLE customer
+ALTER TABLE modification_list_alter
     -- 删除主键约束
-    DROP CONSTRAINT customer_pkey;
+    DROP CONSTRAINT id_primary;
 
 /* 主键 */
 -- 定义主键
-CREATE TABLE users
+CREATE TABLE grammar_primary_key
 (
     -- PRIMARY KEY 主键约束
     -- 主键列的值必须是唯一的,且不能为 NULL
@@ -138,8 +155,9 @@ CREATE TABLE users
     age      INT NOT NULL ,
     grouping INT NOT NULL
 );
+
 -- 定义主键-多列
-CREATE TABLE users
+CREATE TABLE grammar_multiseriate_primary_key
 (
     id   INTEGER ,
     name VARCHAR(30) ,
@@ -150,21 +168,21 @@ CREATE TABLE users
 /* 外键 */
 -- 外键用来定义两个实体之间的约束关系
 -- 创建外键
-CREATE TABLE users
+CREATE TABLE foreign_key_primary_meter
 (
     id   INTEGER PRIMARY KEY ,
     name VARCHAR(30)
 ); -- 主表
-CREATE TABLE orders
+CREATE TABLE foreign_key
 (
     id    INTEGER ,
     email VARCHAR(30) ,
     -- 外键约束名
-    CONSTRAINT orders_users_id_fkey
+    CONSTRAINT foreign_key_primary_meter_id
         -- 指定外键列
         FOREIGN KEY ( id )
             -- 外键列
-            REFERENCES users ( id )
+            REFERENCES foreign_key_primary_meter ( id )
             -- 删除主表数据时，从表数据也删除
             ON DELETE CASCADE
             -- 更新主表数据时，从表数据也更新
@@ -176,14 +194,15 @@ CREATE TABLE orders
     -- SET NULL —— 删除或更新主表数据时，从表数据设置为 NULL
     -- SET DEFAULT —— 删除或更新主表数据时，从表数据设置为默认值
 );
+
 -- 删除外键
-ALTER TABLE orders
-    DROP CONSTRAINT orders_users_id_fkey;
+ALTER TABLE foreign_key
+    DROP CONSTRAINT foreign_key_primary_meter_id;
 
 /* 非空约束 */
 -- 非空约束用来定义列的值不能为 NULL
 -- NULL 不是空串，也不是 0，它表示什么都没有
-CREATE TABLE users
+CREATE TABLE grammar_null
 (
     id   INTEGER PRIMARY KEY ,
     name VARCHAR(30) NOT NULL -- 非空约束
@@ -192,13 +211,14 @@ CREATE TABLE users
 /* 唯一约束 */
 -- 唯一约束用来定义列的值不能重复
 -- 唯一约束列可以包含 NULL 值
-CREATE TABLE users
+CREATE TABLE grammar_unique
 (
     id   INTEGER PRIMARY KEY ,
     name VARCHAR(30) UNIQUE -- 唯一约束
 );
+
 -- 多列唯一约束
-CREATE TABLE users
+CREATE TABLE grammar_multiseriate_unique
 (
     id    INTEGER PRIMARY KEY ,
     name  VARCHAR(30) ,
@@ -209,30 +229,9 @@ CREATE TABLE users
         UNIQUE ( name , email )
 );
 
-/* 生成列 */
--- 生成列用来定义列的值是通过计算得到的
--- 不能直接写入或更新生成列的值
-CREATE TABLE users
-(
-    id        INTEGER PRIMARY KEY ,
-    name      VARCHAR(30) ,
-    age       INTEGER ,
-    -- 生成列
-    full_name INTEGER GENERATED ALWAYS AS (age / 2) STORED -- 存储生成列
-);
-
-/* 标识列 */
--- 标识列用来定义列的值是自动生成的
-CREATE TABLE users
-(
-    -- 标识列
-    id   SERIAL GENERATED ALWAYS AS IDENTITY ,
-    name VARCHAR(30)
-);
-
 /* 检查约束 */
 -- 检查约束用来定义列的值必须满足指定的条件
-CREATE TABLE users
+CREATE TABLE grammar_check
 (
     id   INTEGER PRIMARY KEY ,
     name VARCHAR(30) ,
@@ -244,10 +243,31 @@ CREATE TABLE users
     -- 不满足检查约束条件时，会抛出异常
 );
 
+/* 生成列 */
+-- 生成列用来定义列的值是通过计算得到的
+-- 不能直接写入或更新生成列的值
+CREATE TABLE grammar_generated_column
+(
+    id        INTEGER PRIMARY KEY ,
+    name      VARCHAR(30) ,
+    age       INTEGER ,
+    -- 生成列
+    full_name INTEGER GENERATED ALWAYS AS (age / 2) STORED -- 存储生成列
+);
+
+/* 标识列 */
+-- 标识列用来定义列的值是自动生成的
+CREATE TABLE grammar_identity_column
+(
+    -- 标识列
+    id   INTEGER GENERATED ALWAYS AS IDENTITY ,
+    name VARCHAR(30)
+);
+
 /* 自增列 */
 -- 自增列用来定义列的值是自动生成的
 -- 和标识列不同的是，自增列的值可以手动指定
-CREATE TABLE users
+CREATE TABLE grammar_serial_column
 (
     -- 自增列
     id   SERIAL ,
@@ -259,9 +279,9 @@ CREATE TABLE users
 -- TEMPORARY 临时序列
 CREATE TEMPORARY
     -- 序列名
-    SEQUENCE IF NOT EXISTS users_id_seq
+    SEQUENCE IF NOT EXISTS sequence_name
     -- 序列的数据类型
-    AS INTEGER
+    AS BIGINT
     -- 序列的起始值
     START WITH 1
     -- 序列的最小值
@@ -274,27 +294,29 @@ CREATE TEMPORARY
     CACHE 1
     -- 序列的循环方式
     CYCLE;
+
 -- 删除序列
-DROP SEQUENCE IF EXISTS users_id_seq;
+DROP SEQUENCE IF EXISTS sequence_name;
 
 /* 临时表 */
 -- 临时表用来存储临时数据
 -- 临时表只在当前会话中存在
-CREATE TEMPORARY TABLE users
+CREATE TEMPORARY TABLE grammar_temporary
 (
     id   INTEGER PRIMARY KEY ,
     name VARCHAR(30)
 );
+
 -- 删除临时表
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS grammar_temporary;
 
 /* 结果集创建表 */
 -- 通过结果集创建表
 SELECT * -- 指定复制列
 INTO TEMPORARY -- 是否为临时表
-    customer_test -- 指定表名
+    grammar_null_temporary -- 指定表名
 FROM
-    customer;
+    grammar_null;
 
 /* 事务 */
 -- 事务用来管理一组 SQL 语句的执行
@@ -303,10 +325,11 @@ BEGIN;
 -- 执行 SQL 语句
 INSERT
 INTO
-    users
-    (age)
+    grammar_null
+    (id , name)
 VALUES
-    ('张三');
+    (1 , '张三');
+
 -- 提交事务
 COMMIT;
 -- 回滚事务
@@ -322,15 +345,18 @@ CREATE TABLE IF NOT EXISTS test.users
     id   INTEGER PRIMARY KEY ,
     name VARCHAR(30)
 );
--- 删除架构
-DROP SCHEMA IF EXISTS test;
+
 -- 重命名架构
 ALTER SCHEMA test RENAME TO test1;
+
+-- 删除架构
+DROP SCHEMA IF EXISTS test1 CASCADE;
+
 
 /* 清空表 */
 -- TRUNCATE 速度更快
 -- 不需要扫描表中,直接回收磁盘空间
-TRUNCATE TABLE users CASCADE;
+TRUNCATE TABLE grammar_null CASCADE;
 -- ONLY 限制只清空当前表,不清空子表
 -- CASCADE 如果外键关联,拒绝操作
 
@@ -342,11 +368,12 @@ CREATE TABLE IF NOT EXISTS users
     name VARCHAR(30) ,
     age  INTEGER
 );
+
 CREATE TABLE IF NOT EXISTS orders
 (
     id    INTEGER PRIMARY KEY ,
     email VARCHAR(30) ,
-    CONSTRAINT orders_users_id_fkey
+    CONSTRAINT orders_users_id_foreign_key
         FOREIGN KEY ( id )
             REFERENCES users ( id )
             ON DELETE CASCADE
@@ -363,6 +390,7 @@ INTO
 VALUES
     -- 值
     (1 , '张三' , 18);
+
 -- 插入多行数据
 INSERT
 INTO
@@ -371,6 +399,7 @@ INTO
 VALUES
     (2 , '李四' , 20),
     (3 , '王五' , 22);
+
 -- 返回插入的行信息
 INSERT
 INTO
@@ -381,6 +410,7 @@ VALUES
 -- RETURNING 返回插入的行信息
 -- 可以指定返回的列和别名
 RETURNING id;
+
 -- 插入数据处理
 INSERT
 INTO
@@ -412,9 +442,18 @@ SET
     -- 列名 = 表达式
     age = age + 1
 WHERE
-    id = 2;
+    id = 2
+RETURNING *;
 
 -- 表达式函数
+-- 数据
+INSERT
+INTO
+    orders(id , email)
+VALUES
+    (1 , '11443546565@qq.com'),
+    (2 , '21212321456@qq.com');
+-- 表达式替换
 UPDATE orders
 SET
     -- 替换全部域名
@@ -430,7 +469,8 @@ SET
               WHEN age > 21 THEN age + 1
         -- ELSE 值
               ELSE age - 1
-              END;
+              END
+RETURNING *;
 
 -- 根据其他表更新数据
 UPDATE orders
@@ -455,17 +495,53 @@ WHERE
     id = 4;
 
 /* DQL 数据查询语言 */
+/* 表实例 */
+CREATE TABLE employee
+(
+    id   INTEGER ,
+    name TEXT ,
+    age  INTEGER
+);
+CREATE TABLE detailed_information
+(
+    id           INTEGER ,
+    emil         TEXT ,
+    home_address TEXT
+);
+
+DROP TABLE employee;
+
+/* 数据 */
+INSERT
+INTO
+    employee(id , name , age)
+VALUES
+    (1 , '小白' , 21),
+    (2 , '小红' , 51),
+    (3 , '小黑' , 35),
+    (4 , '小粉' , 19),
+    (5 , '小白' , 26);
+INSERT
+INTO
+    detailed_information(id , emil , home_address)
+VALUES
+    (1 , '12412151231@qq.com' , '北京市'),
+    (2 , '51312513213@qq.com' , '南京市'),
+    (3 , '56121315624@qq.com' , '青岛市'),
+    (4 , '32141324512@qq.com' , '宁波市'),
+    (5 , '12543624467@qq.com' , '西安市');
+
 -- 单表查询
 -- 查询所有列
 SELECT *
 FROM
-    users;
+    employee;
 
 -- 查询指定列
 SELECT
     name
 FROM
-    users;
+    employee;
 
 -- 查询表达式
 SELECT 5 * 3 AS result;
@@ -474,24 +550,26 @@ SELECT 5 * 3 AS result;
 /* 过滤 */
 SELECT *
 FROM
-    users
+    employee
 WHERE
     -- 过滤条件
     id > 2;
 
 -- 过滤条件可以使用 AND 和 OR 连接
-SELECT *
+SELECT
+    id,
+    name
 FROM
-    users
+    employee
 WHERE
             id > 1 AND
             id > 5 OR
-            name = '张三';
+            name = '小白';
 
 /* 排序 */
 SELECT *
 FROM
-    users
+    employee
 ORDER BY
     -- 排序列
     -- ASC 升序（默认）
@@ -500,46 +578,48 @@ ORDER BY
     -- FIRST NULL 在非 NULL 值之前
     -- LAST NULL 在非 NULL 值之后
     NULLS FIRST;
+
 -- 自定义排序
 SELECT *
 FROM
-    users
+    employee
 ORDER BY
     CASE name
-        WHEN '李四' THEN 1
+        WHEN '小红' THEN 1
         ELSE 2
         END;
 
 /* 限定行数 */
 SELECT *
 FROM
-    users
+    employee
     -- NEXT | FIRST 含义相同
     -- NEXT ROWS | ROW 含义相同
     FETCH NEXT 2 ROWS ONLY;
+
 -- LIMIT 非标准语法
 SELECT *
 FROM
-    users
+    employee
 LIMIT 5;
 
 /* 偏移行数 */
 SELECT *
 FROM
-    users
-OFFSET 7;
+    employee
+OFFSET 3;
 
 /* 分页 */
 SELECT *
 FROM
-    users
-OFFSET 3 * 2 FETCH FIRST 2 ROWS ONLY;
+    employee
+OFFSET 0 * 2 FETCH FIRST 2 ROWS ONLY;
 
 /* 排查重复数据 */
 SELECT DISTINCT
     name
 FROM
-    users
+    employee
 ORDER BY
     name;
 
@@ -548,23 +628,23 @@ SELECT
     -- 列名 AS 别名
     name AS user_name
 FROM
-    users;
+    employee;
 
 -- 列别名表达式
 SELECT
     -- 拼接列名和列值
     name || '的年龄是' || age AS user_age
 FROM
-    users;
+    employee;
 
 
 /* 表别名 */
 -- 避免列名冲突
 SELECT
-    u.id,
-    u.age
+    e.id,
+    e.age
 FROM
-    users AS u;
+    employee AS e;
 
 /* 分组 */
 SELECT
@@ -573,7 +653,7 @@ SELECT
     -- 聚合函数
     COUNT(*) AS count
 FROM
-    users
+    employee
 -- 分组
 GROUP BY
     name
@@ -586,7 +666,7 @@ SELECT
     name,
     COUNT(*) AS count
 FROM
-    users
+    employee
 GROUP BY
     name
 -- 过滤分组
@@ -598,22 +678,22 @@ ORDER BY
 /* IN 运算符 */
 SELECT *
 FROM
-    users
+    employee
 WHERE
     -- 匹配查询
-    name IN ( '张三' , '李四' );
+    name IN ( '小黑' , '小绿' );
 
 /* 子查询 */
 -- 一般用在 IN 和 EXISTS 中
 SELECT *
 FROM
-    users
+    employee
 WHERE
         age IN (
         SELECT
             age
         FROM
-            users
+            employee
         WHERE
             age > 21
                );
@@ -621,7 +701,7 @@ WHERE
 /* EXISTS 检查子查询 */
 SELECT *
 FROM
-    users
+    employee
 WHERE
     -- 子查询返回结果不为空 为真
     EXISTS
@@ -629,7 +709,7 @@ WHERE
         SELECT
             age
         FROM
-            users
+            employee
         WHERE
             age > 21
     );
@@ -638,13 +718,14 @@ WHERE
 /* BETWEEN 区间 */
 SELECT *
 FROM
-    users
+    employee
 WHERE
     id BETWEEN 2 AND 6;
+
 -- NOT BETWEEN 区间
 SELECT *
 FROM
-    users
+    employee
 WHERE
     id NOT BETWEEN 2 AND 6;
 
@@ -652,53 +733,58 @@ WHERE
 -- % 任意字符
 SELECT *
 FROM
-    users
+    employee
 WHERE
-    name LIKE '%三';
+    name LIKE '%红';
+
 -- NOT LIKE 模糊查询
 SELECT *
 FROM
-    users
+    employee
 WHERE
-    name NOT LIKE '%三';
+    name NOT LIKE '%红';
+
 -- _ 单个字符
 SELECT *
 FROM
-    users
+    employee
 WHERE
-    name LIKE '_三';
+    name LIKE '_白';
+
 -- ILIKE 忽略大小写
 SELECT *
 FROM
-    users
+    employee
 WHERE
-    name ILIKE '%三';
+    name ILIKE '%黑';
 -- ESCAPE 转义字符
 -- ESCAPE '#' 表示 # 后面的字符不作为通配符
 
 /* IS NULL 空值 */
 SELECT *
 FROM
-    users
+    employee
 WHERE
     name IS NULL;
+
 -- IS NOT NULL 非空值
 SELECT *
 FROM
-    users
+    employee
 WHERE
     name IS NOT NULL;
 
 /* ALL 比较所有值 */
 -- 比较所有值,全部满足才为真
 SELECT 2 = ALL (ARRAY [ 1 , 2 , 3 ]) AS result;
+
 -- 比较子查询所有值
 SELECT
         18 > ALL (
         SELECT
             age
         FROM
-            users
+            employee
                  ) AS result;
 
 /* ANY 比较任意值(任一满足) */
@@ -710,7 +796,7 @@ SELECT
         SELECT
             age
         FROM
-            users
+            employee
                  ) AS result;
 
 /* GROUPING SETS 分组集合 */
@@ -719,7 +805,7 @@ SELECT
     name,
     COUNT(*) AS count
 FROM
-    users
+    employee
 GROUP BY
     -- 分组集合
     GROUPING SETS (
@@ -736,7 +822,7 @@ SELECT
     age,
     COUNT(*) AS count
 FROM
-    users
+    employee
 GROUP BY
     -- 多维分组集合
     ROLLUP (
@@ -752,7 +838,7 @@ SELECT
     age,
     COUNT(*) AS count
 FROM
-    users
+    employee
 GROUP BY
     -- 多维分组集合
     CUBE (
@@ -782,6 +868,7 @@ CREATE TABLE student_score
     -- 得分
     score      INTEGER     NOT NULL
 );
+
 INSERT
 INTO
     student
@@ -899,7 +986,7 @@ WITH
         SELECT
             AVG(age) AS avg_age
         FROM
-            users
+            employee
         ORDER BY
             avg_age DESC
         -- 创建了一个年龄平均值的临时表
@@ -915,6 +1002,39 @@ FROM
     cte_name c;
 
 -- 递归查询
+-- 递归查询操作表
+CREATE TABLE category
+(
+    id        SERIAL PRIMARY KEY ,
+    name      VARCHAR NOT NULL ,
+    parent_id INT ,
+    CONSTRAINT fk_category
+        FOREIGN KEY ( parent_id ) REFERENCES category ( id )
+);
+
+INSERT
+INTO
+    category
+    (id , name , parent_id)
+VALUES
+    (1 , 'ROOT' , NULL),
+    (2 , 'Baby' , 1),
+    (3 , 'Home And Kitchen' , 1),
+    (4 , 'Baby Care' , 2),
+    (5 , 'Feeding' , 2),
+    (6 , 'Gifts' , 2),
+    (7 , 'Safety' , 2),
+    (8 , 'Bedding' , 3),
+    (9 , 'Bath' , 3),
+    (10 , 'Furniture' , 3),
+    (11 , 'Grooming' , 4),
+    (12 , 'Hair Care' , 4),
+    (13 , 'Baby Foods' , 5),
+    (14 , 'Food Mills' , 5),
+    (15 , 'Solid Feeding' , 5),
+    (16 , 'Bed Pillows' , 8),
+    (17 , 'Bed Skirts' , 8);
+
 WITH
     RECURSIVE
     -- 递归查询
@@ -948,27 +1068,25 @@ FROM
 SELECT
     MAX(age)
 FROM
-    users;
+    employee;
 
 /* 视图 */
 -- 根据查询语句创建的虚拟表
 -- 创建视图
-CREATE VIEW users_string
+CREATE VIEW employee_string
 AS
 SELECT
-    id,
-    name,
-    age::VARCHAR AS age
+    name
 FROM
-    users;
+    employee;
 
 -- 查询视图
 SELECT *
 FROM
-    users_string;
+    employee_string;
 
 -- 删除视图
-DROP VIEW users_string;
+DROP VIEW employee_string;
 
 /* 继承 */
 -- 创建表
@@ -998,8 +1116,9 @@ VALUES
 SELECT *
 FROM
     capital;
-DROP TABLE capital;
-DROP TABLE capitals;
+SELECT *
+FROM
+    capitals;
 
 /* 窗口函数 */
 -- 针对每一行数据,基于和它相关的一组数据计算出结果
@@ -1010,52 +1129,55 @@ SELECT
     -- 添加 OVER关键字 指定为窗口函数
     AVG(age) OVER () AS sum_age
 FROM
-    users;
+    employee;
+
 -- 分组窗口函数
 SELECT
     id,
     name,
     age,
-    grouping,
     -- 根据分组计算
-    AVG(age) OVER (PARTITION BY grouping) AS sum_age
+    AVG(age) OVER (PARTITION BY name) AS sum_age
 FROM
-    users;
+    employee;
+
 -- 排序窗口函数
 SELECT
     id,
     name,
     age,
-    grouping,
     -- 根据排序计算
-    RANK() OVER (PARTITION BY grouping ORDER BY age DESC) AS rank
+    RANK() OVER (PARTITION BY name ORDER BY age DESC ) AS rank
 FROM
-    users;
+    employee;
+
+
 -- 窗口分区
 SELECT
     id,
     name,
     age,
-    grouping,
     -- 根据窗口分区计算
-    AVG(age) OVER (PARTITION BY grouping ORDER BY age DESC ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS sum_age
+    AVG(age) OVER (PARTITION BY name ORDER BY age DESC ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS sum_age
 -- ROWS : 以行为单位计算窗口的偏移量
 -- RANGE : 以值为单位计算窗口的偏移量
 -- BETWEEN N PRECEDING AND N FOLLOWING : 从当前行的前 N 行到后 N 行
 FROM
-    users;
+    employee;
+
 -- 定义窗口
 SELECT
     id,
     name,
     age,
-    grouping,
     -- 定义窗口
     AVG(age) OVER w AS sum_age
 FROM
-    users
+    employee
 -- 定义
-WINDOW w AS ( PARTITION BY grouping ORDER BY age DESC);
+WINDOW w AS ( PARTITION BY name ORDER BY age DESC);
+
+
 
 /* 数据库管理 */
 /* 查询数据库 */
@@ -1065,7 +1187,7 @@ FROM
 
 /* 数据库复制 */
 CREATE DATABASE testdb
-    WITH TEMPLATE = study;
+    WITH TEMPLATE study;
 
 DROP DATABASE testdb;
 
@@ -1081,22 +1203,23 @@ FROM
 /* 获取数据库表大小 */
 SELECT
     -- 不包含索引
-    PG_SIZE_PRETTY(PG_RELATION_SIZE('users'));
+    PG_SIZE_PRETTY(PG_RELATION_SIZE('employee'));
 
 SELECT
     -- 包含索引
-    PG_SIZE_PRETTY(PG_TOTAL_RELATION_SIZE('users'));
+    PG_SIZE_PRETTY(PG_TOTAL_RELATION_SIZE('employee'));
+
 SELECT
     tablename,
-    PG_SIZE_PRETTY(PG_TOTAL_RELATION_SIZE('users')) AS size
+    PG_SIZE_PRETTY(PG_TOTAL_RELATION_SIZE('employee')) AS size
 FROM
     pg_tables
 WHERE
-    schemaname = 'public';
+    schemaname = 'grammar';
 
 /* 获取数据库索引大小 */
 SELECT
-    PG_SIZE_PRETTY(PG_INDEXES_SIZE('users'));
+    PG_SIZE_PRETTY(PG_INDEXES_SIZE('employee'));
 
 /* 获取表空间大小 */
 SELECT
@@ -1106,11 +1229,11 @@ SELECT
 SELECT PG_COLUMN_SIZE('hello');
 
 /* 复制表 */
-CREATE TABLE users_copy
+CREATE TABLE employee_copy
 AS
 SELECT *
 FROM
-    users;
+    employee;
 
 /* 创建角色 */
 CREATE ROLE test WITH -- 角色名
@@ -1150,10 +1273,10 @@ DROP ROLE test;
 /* 授权 */
 -- 授权查询权限
 GRANT SELECT
-    ON users TO test;
+    ON employee TO test;
 
 /* 撤销 */
-REVOKE SELECT ON users FROM test;
+REVOKE SELECT ON employee FROM test;
 
 /* 创建角色组 */
 CREATE ROLE father
@@ -1169,7 +1292,7 @@ GRANT CONNECT ON DATABASE
     study TO father;
 
 /* 创建成员角色 */
-CREATE ROLE son2
+CREATE ROLE son1
     WITH
     NOSUPERUSER
     NOCREATEDB
@@ -1196,21 +1319,22 @@ GRANT father TO son1;
 EXPLAIN (ANALYZE )
 SELECT *
 FROM
-    users;
+    employee;
 
 
 /* 索引 */
 -- 索引用来提高查询效率
 -- 索引参数表
-CREATE TABLE test
+CREATE TABLE grammar_index
 (
     id   INTEGER ,
     name TEXT
 );
+
 -- 插入1千万条数据
 INSERT
 INTO
-    test
+    grammar_index
 SELECT
     v,
     'val:' || v
@@ -1221,30 +1345,30 @@ FROM
 EXPLAIN ANALYZE
 SELECT *
 FROM
-    test
+    grammar_index
 WHERE
     id = 1000;
 
 /* 创建索引 */
 CREATE INDEX test_id_index
-    ON test ( id );
+    ON grammar_index ( id );
 
 -- 默认BTREE索引查询
 EXPLAIN ANALYZE
 SELECT *
 FROM
-    test
+    grammar_index
 WHERE
     id = 1000000;
 
 /* 创建非默认索引 */
 CREATE INDEX test_id_index
     -- USING 指定索引类型
-    ON test USING HASH ( id DESC NULLS LAST );
+    ON grammar_index USING HASH ( id DESC NULLS LAST );
 
 /* 多列索引 */
 CREATE INDEX test_id_name_index
-    ON test USING BTREE ( id , name );
+    ON grammar_index USING BTREE ( id , name );
 
 EXPLAIN ANALYZE
 SELECT *
@@ -1255,7 +1379,7 @@ WHERE
     name = 'val:1000000';
 
 /* 删除索引 */
-DROP INDEX IF EXISTS test_id_name_index;
+DROP INDEX IF EXISTS test_id_index;
 
 /* 查看索引 */
 SELECT *
@@ -1265,23 +1389,21 @@ FROM
 /* 唯一索引 */
 -- 确保列的值是唯一的
 CREATE UNIQUE INDEX test_id_index
-    ON test USING BTREE ( id );
+    ON grammar_index USING BTREE ( id );
 
 EXPLAIN ANALYZE
 SELECT *
 FROM
-    users;
-DROP INDEX IF EXISTS test_id_index;
+    grammar_index;
 
 /* 函数索引 */
 CREATE INDEX test_id_index
-    ON test ( UPPER(name) );
+    ON grammar_index ( UPPER(name) );
 
 EXPLAIN ANALYZE
 SELECT *
 FROM
-    test
+    grammar_index
 WHERE
     UPPER(name) = 'VAL:1000000';
-DROP INDEX IF EXISTS test_id_index;
 
