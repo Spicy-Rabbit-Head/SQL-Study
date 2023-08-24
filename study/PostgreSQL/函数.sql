@@ -655,9 +655,86 @@ SELECT EXTRACT(WEEK FROM TIMESTAMP '2022-05-16 12:41:13.662522');
 /*
  检测一个给定的日期、时间戳或间隔值是否是有限大的
  */
+SELECT ISFINITE(TIMESTAMP '2022-05-16 12:41:13.662522');
+SELECT ISFINITE(TIMESTAMP 'infinity');
 
+/*
+ 转换时间间隔的表示方法，将超过 30 天的天数转为月数
+ */
+-- 32 天
+SELECT JUSTIFY_DAYS(INTERVAL '32 days');
 
+/*
+ 转换时间间隔的表示方法，将超过 24 小时的小时数转为天数
+ */
+-- 25 小时
+SELECT JUSTIFY_HOURS(INTERVAL '25 hours');
 
+/*
+ 转换时间间隔的表示方法
+ 将超过 24 小时的小时数转为天数
+ 并且将超过 30 天的天数转为月数
+ */
+-- 6000 小时
+SELECT JUSTIFY_INTERVAL(INTERVAL '6000 hours');
 
+/*
+ 返回当前的系统时间,格式为 HH:MM:SS.ssssss
+ */
+SELECT LOCALTIME;
+-- 指定小数位
+SELECT LOCALTIME(3);
 
+/*
+ 返回所属的事务开始的系统日期和时间
+ */
+SELECT LOCALTIMESTAMP;
+-- 指定小数位
+SELECT LOCALTIMESTAMP(3);
 
+/*
+ 从给定的年、月、日字段创建一个日期
+ (年,月,日)
+ */
+SELECT MAKE_DATE(2022,5,16);
+-- 公元前(BC 表示公元前)
+SELECT MAKE_DATE(-2022,5,16);
+
+/*
+ 从给定的年、月、日、时、分、秒字段创建一个间隔值
+ (年,月,日,周,天,小时,分钟,秒)
+ */
+SELECT MAKE_INTERVAL(1,2,3,4,5,6,1.123);
+-- 单独指定字段
+SELECT MAKE_INTERVAL(years => 2);
+
+/*
+ 从给定的时、分、秒字段创建一个时间
+ (小时,分钟,秒)
+ */
+SELECT MAKE_TIME(20,55,25.1231);
+
+/*
+ 从给定的年、月、日、时、分、秒字段创建一个时间戳值
+ (年,月,日,时,分,秒)
+ */
+SELECT MAKE_TIMESTAMP(2022,5,16,20,55,25.1231);
+-- 公元前(BC 表示公元前)
+SELECT MAKE_TIMESTAMP(-2022,5,16,20,55,25.1231);
+
+/*
+ 从给定的年、月、日、时、分、秒、时区字段创建一个带有时区信息的时间戳值
+ (年,月,日,时,分,秒,时区)
+ */
+SELECT MAKE_TIMESTAMP(2022,5,16,20,55,25.1231);
+-- 指定时区
+SELECT MAKE_TIMESTAMPTZ(2022,5,15,20,55,25.517606,'Asia/Shanghai');
+
+/*
+ 返回所属的事务开始时的系统日期和时间
+ */
+SELECT NOW();
+
+SHOW TIMEZONE;
+
+SET TIME ZONE 'UTC-8';
