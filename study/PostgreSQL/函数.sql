@@ -492,7 +492,7 @@ SELECT MIN_SCALE(2.15);
 SELECT MOD(2,5);
 
 /*
- 返回圆周率 π 的近似值，精确到小数点后 15 位
+ 返回圆周率 π 的近似值,精确到小数点后 15 位
  */
 SELECT PI();
 
@@ -659,13 +659,13 @@ SELECT ISFINITE(TIMESTAMP '2022-05-16 12:41:13.662522');
 SELECT ISFINITE(TIMESTAMP 'infinity');
 
 /*
- 转换时间间隔的表示方法，将超过 30 天的天数转为月数
+ 转换时间间隔的表示方法,将超过 30 天的天数转为月数
  */
 -- 32 天
 SELECT JUSTIFY_DAYS(INTERVAL '32 days');
 
 /*
- 转换时间间隔的表示方法，将超过 24 小时的小时数转为天数
+ 转换时间间隔的表示方法,将超过 24 小时的小时数转为天数
  */
 -- 25 小时
 SELECT JUSTIFY_HOURS(INTERVAL '25 hours');
@@ -726,12 +726,943 @@ SELECT MAKE_TIMESTAMP(-2022,5,16,20,55,25.1231);
  从给定的年、月、日、时、分、秒、时区字段创建一个带有时区信息的时间戳值
  (年,月,日,时,分,秒,时区)
  */
-SELECT MAKE_TIMESTAMP(2022,5,16,20,55,25.1231);
--- 指定时区
 SELECT MAKE_TIMESTAMPTZ(2022,5,15,20,55,25.517606,'Asia/Shanghai');
 
 /*
  返回所属的事务开始时的系统日期和时间
  */
 SELECT NOW();
+
+/*
+将当前服务器进程的执行暂停（睡眠）指定的秒数
+ */
+SELECT NOW();
+SELECT PG_SLEEP(1);
+SELECT NOW();
+
+/*
+ 接收一个间隔参数,将当前服务器进程的执行暂停（睡眠）指定的间隔
+ */
+SELECT NOW();
+SELECT PG_SLEEP_FOR(INTERVAL '2 second');
+SELECT NOW();
+
+/*
+ 接收一个时间戳值,将当前服务器进程的执行暂停（睡眠）到这个指定的时刻
+ */
+SELECT NOW();
+SELECT PG_SLEEP_UNTIL(NOW() + INTERVAL '5 second');
+SELECT NOW();
+
+/*
+ 函数返回所在的语句开始执行时的时间戳
+ */
+SELECT STATEMENT_TIMESTAMP();
+
+/*
+ 返回一个表表示此函数执行时的时间戳的字符串
+ 同一个语句中的两次执行的返回值可能不同
+ */
+SELECT TIMEOFDAY();
+
+/*
+ 根据给定的格式将指定的字符串转为一个日期值
+ */
+SELECT TO_DATE('05 Dec 2000','DD Mon YYYY');
+
+/*
+ 将 Unix 纪元时间转为一个标准的带时区信息的时间戳
+ 或者根据给定的格式将指定的字符串转为时间戳
+ */
+SELECT TO_TIMESTAMP(10000000000);
+
+/*
+ 返回所属的事务开始时的系统日期和时间
+ */
+SELECT TRANSACTION_TIMESTAMP();
+
+
+/* JSON 函数 */
+
+/*
+ 将一个 SQL 数组转为 JSON 数组并返回
+ (转为 JSON 数组的 SQL 数组,是否增加在顶层元素间换行符以美化 JSON)
+ */
+SELECT ARRAY_TO_JSON('{1, 2, 3, 4}'::INT[]);
+-- 美化
+SELECT ARRAY_TO_JSON('{1, 2, 3, 4}'::INT[],TRUE);
+
+/*
+ 将顶层 JSON 数组扩展为一个 JSON 值的集合
+ */
+SELECT
+    JSON_ARRAY_ELEMENTS('[
+      1,
+      2,
+      [
+        3,
+        4
+      ]
+    ]');
+
+/*
+ 将顶层 JSON 数组扩展为一个文本值的集合
+ */
+SELECT
+    JSON_ARRAY_ELEMENTS_TEXT('[
+      1,
+      2,
+      [
+        3,
+        4
+      ]
+    ]');
+
+/*
+ 返回一个指定的 JSON 数组的长度（数组中顶层元素的数量）
+ */
+SELECT
+    JSON_ARRAY_LENGTH('[
+      1,
+      2,
+      [
+        3,
+        4
+      ]
+    ]');
+
+/*
+ 从可变的参数列表中创建一个可能是异构类型的 JSON 数组并返回
+ */
+SELECT JSON_BUILD_ARRAY(1,'a',TRUE);
+
+/*
+ 从可变的参数列表（由交替的交替的键和值组成）中创建 JSON 对象并返回
+ */
+SELECT JSON_BUILD_OBJECT(1,'a',TRUE,ROW (2, 'b', FALSE));
+
+/*
+ 将一个指定的 JSON 对象扩展为一个键值对（键是文本类型,值是 JSON 类型）的集合
+ */
+SELECT
+    JSON_EACH('{
+      "name": "Tom",
+      "age": 20,
+      "hobbies": [
+        "sports",
+        "cars"
+      ]
+    }');
+
+/*
+ 将一个指定的 JSON 对象顶层成员扩展为一个键值对（键和值都是文本类型）的集合
+ */
+SELECT
+    JSON_EACH_TEXT('{
+      "name": "Tom",
+      "age": 20,
+      "hobbies": [
+        "sports",
+        "cars"
+      ]
+    }');
+
+/*
+ 从一个指定的 JSON 值中提取指定的路径的值
+ (要从中提取 JSON 值的 JSON 值,可变的参数列表)
+ */
+SELECT
+    JSON_EXTRACT_PATH('{
+      "a": 1,
+      "b": {
+        "x": 2,
+        "y": 3
+      }
+    }','a');
+-- 提取嵌套
+SELECT
+    JSON_EXTRACT_PATH('{
+      "a": 1,
+      "b": {
+        "x": 2,
+        "y": 3
+      }
+    }','b','y');
+
+/*
+ 从一个指定的 JSON 值中提取指定的路径的值,并将结果作为文本返回
+ (要从中提取 JSON 值的 JSON 值,可变的参数列表)
+ */
+SELECT
+    JSON_EXTRACT_PATH_TEXT('[
+      1,
+      2,
+      [
+        3,
+        4
+      ]
+    ]','0');
+-- 提取嵌套
+SELECT
+    JSON_EXTRACT_PATH_TEXT('{
+      "a": 1,
+      "b": {
+        "x": 2,
+        "y": 3
+      }
+    }','b','y');
+
+/*
+ 从一个文本数组构建一个 JSON 对象,
+ 或者从两个分别作为键和值的数组构建一个 JSON 对象
+ (一个文本数组)
+ (一个包含了键的文本数组,一个包含了键的文本数组)
+ */
+SELECT JSON_OBJECT(ARRAY [1, 'a', TRUE, ROW (2, 'b', FALSE)]::TEXT[]);
+-- 从一个二维数组构建一个 JSON 对象
+SELECT JSON_OBJECT('{{1, 2}, {3, 4}, {a, 6}}');
+-- 从两个一维数组构建一个 JSON 对象
+SELECT JSON_OBJECT('{x, y}','{1, 2}');
+
+/*
+ 返回指定的 JSON 对象中的顶层键的集合
+ */
+SELECT
+    JSON_OBJECT_KEYS('{
+      "name": "Tom",
+      "age": 20,
+      "hobbies": [
+        "sports",
+        "cars"
+      ]
+    }');
+
+/*
+ 将指定的最顶层的 JSON 对象转为一个自定义的 SQL 类型值
+ (一个任何数据类型的值,一个任何数据类型的值)
+ */
+/*
+ JSON 值转为 SQL 类型的值的规则
+ 1.JSON null 将被转为 SQL null。
+ 2.如果输出列的类型为 JSON 或者 JSONB,JSON 值将被精确的复制。
+ 3.如果输出列是组合类型,并且 JSON 值是对象,则通过递归应用这些规则,将对象的字段转换为输出行类型的列。
+ 4.如果输出列是数组类型并且 JSON 值是 JSON 数组,则通过递归应用这些规则,将 JSON 数组的元素转换为输出数组的元素。
+ 5.否则,如果 JSON 值是字符串,则将字符串的内容将被送到该列数据类型对应的输入转换函数。
+ 6.否则,JSON 值的普通文本表示将被送到该列数据类型的输入转换函数。
+ */
+-- 自定义SQL类型
+CREATE TYPE ADDRESS AS
+(
+    country TEXT ,
+    city    TEXT
+);
+CREATE TYPE PERSON AS
+(
+    name    TEXT ,
+    age     INT ,
+    hobbies TEXT[] ,
+    address ADDRESS
+);
+-- 转换
+SELECT *
+FROM
+    JSON_POPULATE_RECORD(
+            NULL::PERSON,
+            '{
+              "name": "Tom",
+              "age": 20,
+              "hobbies": [
+                "sports",
+                "cars"
+              ],
+              "address": {
+                "country": "CN",
+                "city": "BeiJing"
+              }
+            }'
+        );
+
+/*
+ 将指定的最顶层的 JSON 数组转为一个自定义的 SQL 类型值的集合
+ (一个任何数据类型的值,要转的 JSON 数组)
+ */
+-- 自定义SQL类型
+CREATE TYPE MY_TYPE AS
+(
+    x TEXT ,
+    y INT ,
+    z TEXT
+);
+-- 转换
+SELECT *
+FROM
+    JSON_POPULATE_RECORDSET(
+            NULL::MY_TYPE,
+            '[
+              {
+                "x": "A",
+                "y": 1
+              },
+              {
+                "x": "B",
+                "y": 2
+              }
+            ]'
+        );
+-- null时的默认值
+SELECT *
+FROM
+    JSON_POPULATE_RECORDSET(
+            ( 'x' , 0 , 'z' )::MY_TYPE,
+            '[
+              {
+                "x": "A",
+                "y": 1
+              },
+              {
+                "x": "B",
+                "y": 2
+              }
+            ]'
+        );
+
+/*
+ 递归地删除对象中的值为 null 的字段,非对象字段的 null 值不处理
+ */
+SELECT
+    JSON_STRIP_NULLS('[
+      1,
+      null,
+      3,
+      {
+        "x": 1,
+        "y": null
+      }
+    ]');
+
+/*
+ 将指定的最顶层的 JSON 对象扩展为一个在 AS 子句中定义的具有符合类型的行
+ */
+SELECT *
+FROM
+    JSON_TO_RECORD(
+            '{
+              "name": "Tom",
+              "age": 20,
+              "hobbies": [
+                "sports",
+                "cars"
+              ]
+            }'
+        ) AS x( name TEXT , age INT , hobbies TEXT[] );
+
+/*
+ 将指定的最顶层的 JSON 数组（元素为对象）扩展为一个在 AS 子句中定义的具有符合类型的行的集合
+ */
+SELECT *
+FROM
+    JSON_TO_RECORDSET(
+            '[
+              {
+                "x": "A",
+                "y": 1
+              },
+              {
+                "x": "B",
+                "y": 2
+              }
+            ]'
+        ) AS x( x TEXT , y INT );
+
+/*
+ 以字符串的形式返回指定的 JSON 值的类型
+ */
+SELECT
+    JSON_TYPEOF('"abc"'),
+    JSON_TYPEOF('123.45'),
+    JSON_TYPEOF('true'),
+    JSON_TYPEOF('[
+      1,
+      2,
+      3
+    ]'),
+    JSON_TYPEOF('{
+      "x": 1
+    }'),
+    JSON_TYPEOF('null');
+
+/*
+ 将顶层 JSON 数组扩展为一个 JSONB 值的集合
+ */
+SELECT
+    JSONB_ARRAY_ELEMENTS('[
+      1,
+      2,
+      [
+        3,
+        4
+      ]
+    ]');
+
+/*
+ 将顶层 JSONB 数组扩展为一个文本值的集合
+ */
+SELECT
+    JSONB_ARRAY_ELEMENTS_TEXT('[
+      1,
+      2,
+      [
+        3,
+        4
+      ]
+    ]');
+
+/*
+ 返回一个指定的 JSONB 数组的长度（数组中顶层元素的数量）
+ */
+SELECT
+    JSONB_ARRAY_LENGTH('[
+      1,
+      2,
+      [
+        3,
+        4
+      ]
+    ]');
+
+/*
+ 从可变的参数列表中创建一个可能是异构类型的 JSONB 数组并返回
+ */
+SELECT JSONB_BUILD_ARRAY(1,'a',TRUE,ROW (2, 'b', FALSE));
+
+/*
+ 从可变的参数列表（由交替的交替的键和值组成）中创建 JSONB 对象并返回
+ */
+SELECT JSONB_BUILD_OBJECT(1,'a',TRUE,ROW (2, 'b', FALSE));
+
+/*
+ 将一个指定的 JSONB 对象扩展为一个键值对（键是文本类型,值是 JSONB 类型）的集合
+ */
+SELECT
+    JSONB_EACH('{
+      "name": "Tom",
+      "age": 20,
+      "hobbies": [
+        "sports",
+        "cars"
+      ]
+    }');
+
+/*
+ 将一个指定的 JSONB 对象顶层成员扩展为一个键值对（键和值都是文本类型）的集合
+ */
+SELECT
+    JSONB_EACH_TEXT('{
+      "name": "Tom",
+      "age": 20,
+      "hobbies": [
+        "sports",
+        "cars"
+      ]
+    }');
+
+/*
+ 从一个指定的 JSONB 对象中根据指定的路径提取 JSONB 子对象
+ */
+SELECT
+    JSONB_EXTRACT_PATH('[
+      1,
+      2,
+      [
+        3,
+        4
+      ]
+    ]','0');
+-- 提取嵌套
+SELECT
+    JSONB_EXTRACT_PATH('{
+      "a": 1,
+      "b": {
+        "x": 2,
+        "y": 3
+      }
+    }','b','y');
+
+/*
+ 从一个指定的 JSONB 对象中根据指定的路径提取 JSONB 子对象,并将结果作为文本返回
+ (要从中提取 JSONB 值的 JSONB 值,可变的参数列表)
+ */
+SELECT
+    JSONB_EXTRACT_PATH_TEXT('[
+      1,
+      2,
+      [
+        3,
+        4
+      ]
+    ]','0');
+-- 提取嵌套
+SELECT
+    JSONB_EXTRACT_PATH_TEXT('{
+      "a": 1,
+      "b": {
+        "x": 2,
+        "y": 3
+      }
+    }','b','y');
+
+/*
+ 将一个新值插入到一个给定的 JSONB 值中通过路径指定的位置
+ (要插入新值的 JSONB 值,文本数组:指示了新值插入的位置,要插入的新值,是否插入到指定的位置之后)
+ */
+SELECT
+    JSONB_INSERT('{
+      "x": 1
+    }','{y}','2');
+SELECT
+    JSONB_INSERT('{
+      "x": 1,
+      "y": [
+        1,
+        2
+      ]
+    }','{y, 0}','0',TRUE);
+
+/*
+ 从一个文本数组构建一个 JSONB 对象,
+ 或者从两个分别作为键和值的数组构建一个 JSONB 对象
+ (一个文本数组)
+ (一个包含了键的文本数组,一个包含了键的文本数组)
+ */
+-- 一个一维数组构建一个 JSONB 对象
+SELECT JSONB_OBJECT(ARRAY [1, 'a', TRUE, ROW (2, 'b', FALSE)]::TEXT[]);
+-- 从一个二维数组构建一个 JSONB 对象
+SELECT JSONB_OBJECT('{{1, 2}, {3, 4}, {a, 6}}');
+-- 从两个一维数组构建一个 JSONB 对象
+SELECT JSONB_OBJECT('{x, y}','{1, 2}');
+
+/*
+ 返回指定的 JSONB 对象中的顶层键的集合
+ */
+SELECT
+    JSONB_OBJECT_KEYS('{
+      "name": "Tom",
+      "age": 20,
+      "hobbies": [
+        "sports",
+        "cars"
+      ]
+    }');
+
+/*
+ 在一个给定的 JSON 中检查一个指定的路径是否是否有返回值
+ (要检查的 JSONB 值,要检查的 JSON 路径,路径中要用到的变量值)
+ */
+SELECT
+    JSONB_PATH_EXISTS('[
+      1,
+      2,
+      3
+    ]','$[*] ? (@ > 1)');
+
+/*
+ 在一个给定的 JSON 中检查一个指定的路径是否是否有返回值
+ 提供了对带有时区的日期/时间的支持
+ (要检查的 JSONB 值,要检查的 JSON 路径,路径中要用到的变量值)
+ */
+SELECT
+    JSONB_PATH_EXISTS_TZ('[
+      1,
+      2,
+      3
+    ]','$[*] ? (@ > 1)');
+-- 时区
+SELECT
+    JSONB_PATH_EXISTS_TZ(
+            '[
+              "2015-08-01 12:00:00 +00"
+            ]',
+            '$[*] ? (@.datetime() < "2015-08-02".datetime())'
+        );
+
+/*
+ 返回一个 JSON 路径断言对一个指定的 JSON 值的执行结果
+ (要检查的 JSONB 值,要执行的 JSON 路径断言,路径中要用到的变量值)
+ */
+SELECT
+    JSONB_PATH_MATCH('[
+      1,
+      2,
+      3
+    ]','exists($[*] ? (@ > 1))');
+
+/*
+ 返回一个 JSON 路径断言对一个指定的 JSON 值的执行结果
+ 提供了对带有时区的日期/时间的支持
+ (要检查的 JSONB 值,要执行的 JSON 路径断言,路径中要用到的变量值)
+ */
+SELECT
+    JSONB_PATH_MATCH_TZ('[
+      1,
+      2,
+      3
+    ]','exists($[*] ? (@ > 1))');
+-- 时区
+SELECT
+    JSONB_PATH_MATCH_TZ(
+            '[
+              "2015-08-01 12:00:00 +00"
+            ]',
+            'exists($[*] ? (@.datetime() < "2015-08-02".datetime()))'
+        );
+
+/*
+ 在一个给定的 JSON 中根据指定的路径获取值,并将所有匹配的值作为一个集合返回
+ (要检查的 JSONB 值,要检查的 JSON 路径,路径中要用到的变量值)
+ */
+SELECT
+    JSONB_PATH_QUERY('[
+      1,
+      2,
+      3
+    ]','$[*] ? (@ > 1)');
+
+/*
+ 在一个给定的 JSON 中根据指定的路径获取值,并将所有匹配的值作为一个数组返回
+ (要检查的 JSONB 值,要检查的 JSON 路径,路径中要用到的变量值)
+ */
+SELECT
+    JSONB_PATH_QUERY_ARRAY('[
+      1,
+      2,
+      3
+    ]','$[*] ? (@ > 1)');
+
+/*
+ 在一个给定的 JSON 中根据指定的路径获取值,并将所有匹配的值作为一个数组返回
+ 提供了对带有时区的日期/时间的支持
+ (要检查的 JSONB 值,要检查的 JSON 路径,路径中要用到的变量值)
+ */
+SELECT
+    JSONB_PATH_QUERY_ARRAY_TZ('[
+      1,
+      2,
+      3
+    ]','$[*] ? (@ > 1)');
+-- 时区
+SELECT
+    JSONB_PATH_QUERY_ARRAY_TZ(
+            '[
+              "2015-08-01 12:00:00 +00"
+            ]',
+            '$[*] ? (@.datetime() < "2015-08-02".datetime())'
+        );
+
+/*
+ 在一个给定的 JSON 中根据指定的路径获取值,并返回第一个匹配的值
+ (要检查的 JSONB 值,要检查的 JSON 路径,路径中要用到的变量值)
+ */
+SELECT
+    JSONB_PATH_QUERY_FIRST('[
+      1,
+      2,
+      3
+    ]','$[*] ? (@ > 1)');
+
+/*
+ 在一个给定的 JSON 中根据指定的路径获取值,并返回第一个匹配的值
+ 提供了对带有时区的日期/时间的支持
+ (要检查的 JSONB 值,要检查的 JSON 路径,路径中要用到的变量值)
+ */
+SELECT
+    JSONB_PATH_QUERY_FIRST_TZ('[
+      1,
+      2,
+      3
+    ]','$[*] ? (@ > 1)');
+-- 时区
+SELECT
+    JSONB_PATH_QUERY_FIRST_TZ(
+            '[
+              "2015-08-01 12:00:00 +00"
+            ]',
+            '$[*] ? (@.datetime() < "2015-08-02".datetime())'
+        );
+
+/*
+ 在一个给定的 JSON 中根据指定的路径获取值,并将所有匹配的值作为一个集合返回
+ 提供了对带有时区的日期/时间的支持
+ (要检查的 JSONB 值,要检查的 JSON 路径,路径中要用到的变量值)
+ */
+SELECT
+    JSONB_PATH_QUERY_TZ('[
+      1,
+      2,
+      3
+    ]','$[*] ? (@ > 1)');
+-- 时区
+SELECT
+    JSONB_PATH_QUERY_TZ(
+            '[
+              "2015-08-01 12:00:00 +00",
+              "2015-08-01 13:00:00 +00"
+            ]',
+            '$[*] ? (@.datetime() < "2015-08-02".datetime())'
+        );
+
+/*
+ 将指定的最顶层的 JSONB 对象转为一个自定义的 SQL 类型值
+ (一个任何数据类型的值,要转的 JSONB 对象)
+ 转换规则见 JSON_POPULATE_RECORD
+ */
+SELECT *
+FROM
+    JSONB_POPULATE_RECORD(
+            NULL::PERSON,
+            '{
+              "name": "Tom",
+              "age": 20,
+              "hobbies": [
+                "sports",
+                "cars"
+              ],
+              "address": {
+                "country": "CN",
+                "city": "BeiJing"
+              }
+            }'
+        );
+
+/*
+ 将指定的最顶层的 JSONB 数组转为一个自定义的 SQL 类型值的集合
+ (一个任何数据类型的值,要转的 JSONB 数组)
+ */
+SELECT *
+FROM
+    JSONB_POPULATE_RECORDSET(
+            NULL::MY_TYPE,
+            '[
+              {
+                "x": "A",
+                "y": 1
+              },
+              {
+                "x": "B",
+                "y": 2
+              }
+            ]'
+        );
+-- null时的默认值
+SELECT *
+FROM
+    JSONB_POPULATE_RECORDSET(
+            ( 'x' , 0 , 'z' )::MY_TYPE,
+            '[
+              {
+                "x": "A",
+                "y": 1
+              },
+              {
+                "x": "B",
+                "y": 2
+              }
+            ]'
+        );
+
+/*
+ 使用空格缩进和换行将给定的 JSONB 值转为格式化的、更易于阅读的文本
+ */
+SELECT
+    JSONB_PRETTY('[
+      1,
+      2,
+      3,
+      [
+        4,
+        5
+      ]
+    ]');
+
+/*
+ 替换指定的路径上的值或者在指定的路径上插入值
+ (要插入新值的 JSONB 值,文本数组:新值插入的位置,要插入的新值,是否插入到指定的位置之后)
+ */
+SELECT
+    JSONB_SET('[
+      0,
+      1,
+      2
+    ]','{1}','"x"');
+
+/*
+ 替换指定的路径上的值或者在指定的路径上插入值
+ 此函数与 jsonb_set() 的不同之处是对 NULL 值的处理方式不同
+ (要插入新值的 JSONB 值,文本数组:新值插入的位置,要插入的新值,是否插入到指定的位置之后,为 NULL 时的不同的处理方式)
+ */
+/*
+ 为 NULL 时的不同的处理方式
+ 'raise_exception': 当 new_value 为 NULL 时,给出一个错误。
+ 'use_json_null': 当 new_value 为 NULL 时,使用 JSON null 值。
+ 'delete_key': 当 new_value 为 NULL 时,删掉对应的键。
+ 'return_target': 当 new_value 为 NULL 时,返回原来的 JSON 值。
+ */
+SELECT
+    JSONB_SET_LAX('[
+      0,
+      1,
+      2
+    ]','{1}','"x"');
+-- NULL 处理
+SELECT
+    JSONB_SET_LAX('{
+      "x": 1,
+      "y": 2
+    }','{y}',NULL,TRUE,'delete_key');
+
+/*
+ 递归地删除对象中的值为 null 的字段,非对象字段的 null 值不处理
+ */
+SELECT
+    JSONB_STRIP_NULLS('[
+      1,
+      null,
+      3,
+      {
+        "x": 1,
+        "y": null
+      }
+    ]');
+
+/*
+ 将指定的最顶层的 JSONB 对象扩展为一个在 AS 子句中定义的具有符合类型的行
+ */
+SELECT *
+FROM
+    JSONB_TO_RECORD(
+            '{
+              "name": "Tom",
+              "age": 20,
+              "hobbies": [
+                "sports",
+                "cars"
+              ]
+            }'
+        ) AS x( name TEXT , age INT , hobbies TEXT[] );
+
+/*
+ 将指定的最顶层的 JSONB 数组（元素为对象）扩展为一个在 AS 子句中定义的具有符合类型的行的集合
+ */
+SELECT *
+FROM
+    JSONB_TO_RECORDSET(
+            '[
+              {
+                "x": "A",
+                "y": 1
+              },
+              {
+                "x": "B",
+                "y": 2
+              }
+            ]'
+        ) AS x( x TEXT , y INT );
+
+/*
+ 以字符串的形式返回指定的 JSONB 值的类型
+ */
+SELECT
+    JSONB_TYPEOF('"abc"'),
+    JSONB_TYPEOF('123.45'),
+    JSONB_TYPEOF('true'),
+    JSONB_TYPEOF('[
+      1,
+      2,
+      3
+    ]'),
+    JSONB_TYPEOF('{
+      "x": 1
+    }'),
+    JSONB_TYPEOF('null');
+
+/*
+ 将一个 SQL 复合类型的值转为 JSON 对象并返回
+ (要转为 JSON 对象的 SQL 复合类型的值)
+ (要转为 JSON 对象的 SQL 复合类型的值,是否增加在顶层元素间换行符以美化 JSON)
+ */
+SELECT ROW_TO_JSON(ROW ('Tom', 20, 'He likes sports.'));
+-- 美化
+SELECT ROW_TO_JSON(ROW ('Tom', 20, 'He likes sports.'),TRUE);
+
+/*
+ 将一个 SQL 值转为 JSON 值并返回
+ */
+SELECT
+    TO_JSON(20),
+    TO_JSON('x'::TEXT),
+    TO_JSON(TRUE);
+
+/*
+ 将一个 SQL 值转为 JSONB 值并返回
+ */
+SELECT
+    TO_JSONB(20),
+    TO_JSONB('x'::TEXT),
+    TO_JSONB(TRUE);
+
+
+/* 数组函数 */
+
+/*
+ 将指定的元素追加到指定的数组的最后并返回修改后的数组
+ (要追加元素的数组,要追加的元素)
+ */
+SELECT ARRAY_APPEND(ARRAY [0, 1, 2],3);
+
+/*
+ 将两个指定的数组连接为一个数组并返回连接后的数组
+ (要连接的数组,要连接的数组)
+ */
+SELECT ARRAY_CAT(ARRAY [0, 1, 2],ARRAY [3, 4, 5]);
+
+/*
+ 返回一个表示指定的数组的维度的文本
+ */
+SELECT ARRAY_DIMS(ARRAY [0, 1, 2]);
+
+/*
+ 返回一个填充了指定的元素的数组
+ (要填充的元素,返回一个填充了指定的元素的数组,开始填充数据的起始下标)
+ */
+SELECT ARRAY_FILL(1,ARRAY [5]);
+-- 多维数组
+SELECT ARRAY_FILL(1,ARRAY [3, 2]);
+
+/*
+ 返回指定的数组中指定维度的长度
+ (数组,数组的维度)
+ */
+SELECT ARRAY_LENGTH(ARRAY [0, 1, 2],1);
+-- 多维数组
+SELECT ARRAY_LENGTH(ARRAY [[1,2], [3,4], [5,6]],2);
+
+/*
+ 返回指定的数组中指定维度的起始索引
+ (数组,数组的维度)
+ */
+SELECT ARRAY_LOWER(ARRAY [0, 1, 2],1);
+SELECT ARRAY_LOWER('[3:7]={1,1,1,1,1}'::INTEGER[],1);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
