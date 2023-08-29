@@ -2083,7 +2083,7 @@ SELECT LOWER('(1, 4]'::INT4RANGE);
 /*
  返回一个包含了给定范围的多值范围
  */
-SELECT multirange('(1, 3)'::INT4RANGE);
+SELECT MULTIRANGE('(1, 3)'::INT4RANGE);
 
 /*
  计算包含了所有范围或者整个多值范围的最小范围
