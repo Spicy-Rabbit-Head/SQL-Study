@@ -19,7 +19,7 @@ SELECT BIT_LENGTH('2'), BIT_LENGTH('你');
  从一个字符的开头和结尾删除一个包含了
  由参数指定的所有字符（默认为空格）的最长的字符串
  */
-SELECT BTRIM('xxyHello','xy');
+SELECT BTRIM('xxyHello', 'xy');
 
 
 /*
@@ -44,18 +44,18 @@ SELECT CHR('65');
 /*
  将所有参数拼接为一个字符串并返回结果
  */
-SELECT CONCAT('Hello',' ','World');
+SELECT CONCAT('Hello', ' ', 'World');
 
 
 /*
  使用分隔符接为一个字符串并返回结果
  */
-SELECT CONCAT_WS('-','Hello','World');
+SELECT CONCAT_WS('-', 'Hello', 'World');
 
 /*
  根据指定的格式字符串和参数返回一个格式化的字符串
  */
-SELECT FORMAT('Hello %s','World');
+SELECT FORMAT('Hello %s', 'World');
 -- 格式化由 % 开始,类型结束
 -- 可选参数: position 指定选择第几个参数
 -- 可选参数: flags 和宽度搭配,-号为左对齐,否则默认
@@ -70,9 +70,9 @@ SELECT INITCAP('hello world');
 /*
  在指定字符串中提取最左侧的指定数量的字符并返回
  */
-SELECT LEFT('hello',2);
+SELECT LEFT('hello', 2);
 -- 可以为负数,负数时从右侧除去指定数量并返回
-SELECT LEFT('hello',-1);
+SELECT LEFT('hello', -1);
 
 /*
  返回指定的字符串的长度
@@ -90,15 +90,15 @@ SELECT LOWER('HELLO');
  */
 -- 未超过指定的长度则填充
 -- 超过则截断
-SELECT LPAD('Hello',10);
+SELECT LPAD('Hello', 10);
 -- 指定填充
-SELECT LPAD('Hello',10,'World');
+SELECT LPAD('Hello', 10, 'World');
 
 /*
  从一个字符的左侧删除一个包含了由参数指定的
  所有字符（默认为空格）的最长的字符串
  */
-SELECT LTRIM('abc','a');
+SELECT LTRIM('abc', 'a');
 
 /*
  计算一个指定的字符串的 md5 哈希值
@@ -109,7 +109,7 @@ SELECT MD5('666');
 /*
  将给定的字符串转换为指定的 Unicode 规范化形式
  */
-SELECT NORMALIZE(U&'\0061\0308bc',NFC);
+SELECT NORMALIZE(U&'\0061\0308bc', NFC);
 -- NFD：规范化分解
 -- NFKD：兼容性分解
 -- NFC：规范化分解后再规范化组合
@@ -131,7 +131,7 @@ SELECT OVERLAY('Hello Tim' PLACING 'Hi' FROM 1 FOR 5);
  如果启用了严格模式,最后一个标识符之后的其他字符将会导致一个错误
  如果未启用严格模式,将会忽略额外的字符
  */
-SELECT PARSE_IDENT('"SomeSchema"."someTable"',TRUE);
+SELECT PARSE_IDENT('"SomeSchema"."someTable"', TRUE);
 
 /*
  返回当前客户端使用的编码
@@ -167,43 +167,43 @@ SELECT QUOTE_NULLABLE('abc');
  从一个字符串中返回指定的正则表达式的第一个匹配的结果
  最后可添加匹配模式参数
  */
-SELECT REGEXP_MATCH('Abc abC aBc','ab.','i');
+SELECT REGEXP_MATCH('Abc abC aBc', 'ab.', 'i');
 
 /*
  从一个字符串中返回指定的正则表达式的第一次匹配的结果
  如果使用了 g 标识,则返回所有的匹配结果
  最后可添加匹配模式参数
  */
-SELECT REGEXP_MATCHES('abc abC Abc','ab.','g');
+SELECT REGEXP_MATCHES('abc abC Abc', 'ab.', 'g');
 
 /*
  一个给定字符串中用给定的内容替换给定的正则表达式的第一个匹配的子串
  如果使用了 g 标识,则替换所有的匹配结果
  最后可添加匹配模式参数
  */
-SELECT REGEXP_REPLACE('aBc abc','ab.','xxx');
+SELECT REGEXP_REPLACE('aBc abc', 'ab.', 'xxx');
 
 /*
  将一个指定的字符串按照通过 POSIX 正则表达式指定的分隔符拆分成数组并返回
  最后可添加匹配模式参数
  */
-SELECT REGEXP_SPLIT_TO_ARRAY('a-b-c','-');
+SELECT REGEXP_SPLIT_TO_ARRAY('a-b-c', '-');
 
 /*
  将一个指定的字符串按照通过 POSIX 正则表达式指定的分隔符拆分成一个结果集并返回
  最后可添加匹配模式参数
  */
-SELECT REGEXP_SPLIT_TO_TABLE('a-b-c','-');
+SELECT REGEXP_SPLIT_TO_TABLE('a-b-c', '-');
 
 /*
  将指定的字符串重复指定的次数并返回
  */
-SELECT REPEAT('Hello',3);
+SELECT REPEAT('Hello', 3);
 
 /*
  将一个指定的字符串中出现的所有指定的子字符串替换为新的子字符串并返回结果
  */
-SELECT REPLACE('Hello','H','h');
+SELECT REPLACE('Hello', 'H', 'h');
 
 /*
  反转一个指定的字符串中的字符顺序并返回反转的字符串
@@ -213,55 +213,55 @@ SELECT REVERSE('abc');
 /*
  在指定字符串中提取最右侧的指定数量的字符并返回
  */
-SELECT RIGHT('abc',1);
+SELECT RIGHT('abc', 1);
 -- 可以为负数,负数时从右侧除去指定数量并返回
-SELECT RIGHT('abc',-2);
+SELECT RIGHT('abc', -2);
 
 /*
  在一个字符串的右侧填充指定的字符
  使其达到指定的长度
  超过长度则截断
  */
-SELECT RPAD('Hello',10,'!');
+SELECT RPAD('Hello', 10, '!');
 
 /*
  从一个字符的右侧删除一个包含了由参数指定的所有字符（默认为空格）的最长的字符串
  */
-SELECT RTRIM('abc','c');
+SELECT RTRIM('abc', 'c');
 
 /*
  将一个指定的字符串按照指定的分隔符拆分
  并返回指定的部分
  */
-SELECT SPLIT_PART('a-b-c','-',2);
+SELECT SPLIT_PART('a-b-c', '-', 2);
 
 /*
  检查一个字符串是否以一个指定的前缀开头
  */
-SELECT STARTS_WITH('abc','a');
+SELECT STARTS_WITH('abc', 'a');
 
 /*
  将一个指定的字符串按照指定的分隔符拆分成数组并返回
  最后指定拆分后的数组中与它匹配的元素将被替换为 NULL
  */
-SELECT STRING_TO_ARRAY('a-b-c-!','-','!');
+SELECT STRING_TO_ARRAY('a-b-c-!', '-', '!');
 
 /*
  将一个指定的字符串按照指定的分隔符拆分并将结果作为表返回
  最后指定拆分后的数组中与它匹配的元素将被替换为 NULL
  */
-SELECT STRING_TO_TABLE('a-b-c-!','-','!');
+SELECT STRING_TO_TABLE('a-b-c-!', '-', '!');
 
 /*
  返回一个指定的子字符串在一个字符串中的第一个起始索引
  */
-SELECT STRPOS('abc','b');
+SELECT STRPOS('abc', 'b');
 
 /*
  从一个指定的字符串中根据指定的起始位置和长度提取子字符串并返回
  默认是提取到字符串的结尾
  */
-SELECT SUBSTR('Hello',2,2);
+SELECT SUBSTR('Hello', 2, 2);
 
 /*
  从一个指定的字符串中根据指定的起始位置和长度提取子字符串
@@ -275,14 +275,14 @@ SELECT SUBSTRING('abc' FROM 'b.');
 /*
  将指定的字符串从一个指定的编码转为 ASCII
  */
-SELECT TO_ASCII('Hello','LATIN1');
+SELECT TO_ASCII('Hello', 'LATIN1');
 
 /*
  根据指定的格式将时间戳值、间隔值、数字值转为字符串并返回结果
  模板格式详看附4
  */
-SELECT TO_CHAR(TIMESTAMP '2022-05-17 17:31:12.112','YYYY/MM/DD HH12:MI:SS');
-SELECT TO_CHAR(12345678.9,'999G999G999G999G999.900');
+SELECT TO_CHAR(TIMESTAMP '2022-05-17 17:31:12.112', 'YYYY/MM/DD HH12:MI:SS');
+SELECT TO_CHAR(12345678.9, '999G999G999G999G999.900');
 
 /*
  将指定的数字转换为十六进制表示并返回
@@ -293,13 +293,13 @@ SELECT TO_HEX(233);
  根据给定的格式将指定的字符串转为一个数字
  模板格式详看附4
  */
-SELECT TO_NUMBER('123,456,789.012-','999G999G999D999S');
+SELECT TO_NUMBER('123,456,789.012-', '999G999G999D999S');
 
 /*
  根据指定的翻译关系来翻译一个指定的字符串
  翻译关系是两个字符串中的字符的一一对应关系
  */
-SELECT TRANSLATE('hello judi','judi','tim');
+SELECT TRANSLATE('hello judi', 'judi', 'tim');
 
 /*
  从指定字符串的开头、结尾或者两端删除
@@ -368,13 +368,13 @@ SELECT ATAN(0.2);
  以弧度为单位返回指定的两个数除法运算的结果的反正切
  (被除数,除数)
  */
-SELECT ATAN2(1,2);
+SELECT ATAN2(1, 2);
 
 /*
  以度为单位返回指定的两个数除法运算的结果的反正切
  (被除数,除数)
  */
-SELECT ATAN2D(1,2);
+SELECT ATAN2D(1, 2);
 
 /*
  以度为单位返回指定数值的反正切
@@ -435,7 +435,7 @@ SELECT DEGREES(3.14);
  将指定的两个数字做除法运算并返回整数商
  (被除数,除数)
  */
-SELECT DIV(3,2);
+SELECT DIV(3, 2);
 
 /*
  返回自然常数 e 的指定的次方
@@ -456,13 +456,13 @@ SELECT FLOOR(10.11);
  返回指定的两个数字的最大公约数
  (被除数,除数)
  */
-SELECT GCD(3,2);
+SELECT GCD(3, 2);
 
 /*
  返回指定的两个数字的最小公倍数
  (被除数,除数)
  */
-SELECT LCM(3,2);
+SELECT LCM(3, 2);
 
 /*
  返回由参数指定的数字的自然对数
@@ -473,7 +473,7 @@ SELECT LN(3);
  返回由参数指定的数字的指定的底的对数
  (底数,一个需要获取其对数的数字)
  */
-SELECT LOG(10,9);
+SELECT LOG(10, 9);
 
 /*
  返回由参数指定的数字的以 10 为底的对数
@@ -489,7 +489,7 @@ SELECT MIN_SCALE(2.15);
  返回指定的两个数字做除法运算后的余数
  (被除数,除数)
  */
-SELECT MOD(2,5);
+SELECT MOD(2, 5);
 
 /*
  返回圆周率 π 的近似值,精确到小数点后 15 位
@@ -499,7 +499,7 @@ SELECT PI();
 /*
  返回一个指定数字的指定的次方
  */
-SELECT POWER(2,5);
+SELECT POWER(2, 5);
 
 /*
  将指定的度数值转为弧度值并返回结果
@@ -514,7 +514,7 @@ SELECT RANDOM();
 /*
  将指定的数字四舍五入后到指定的精度并返回结果
  */
-SELECT ROUND(2.251,2);
+SELECT ROUND(2.251, 2);
 
 /*
  返回给定数字的小数位数
@@ -576,15 +576,15 @@ SELECT TRIM_SCALE(0.21000);
 /*
  将指定的数字截断到指定的精度并返回结果
  */
-SELECT TRUNC(0.21111,2);
+SELECT TRUNC(0.21111, 2);
 
 /*
  返回一个指定的操作数位于一些指定的桶中的位置
  (操作数, 所有的桶的最小边界（包含）, 所有的桶的最大边界（不包含）, 桶的数量)
  (操作数, 所有的桶都通过此数组定义)
  */
-SELECT WIDTH_BUCKET(6,2,8,3);
-SELECT WIDTH_BUCKET(6,ARRAY [2, 4, 6, 8]::INT[]);
+SELECT WIDTH_BUCKET(6, 2, 8, 3);
+SELECT WIDTH_BUCKET(6, ARRAY [2, 4, 6, 8]::INT[]);
 
 /* 日期时间函数 */
 
@@ -593,7 +593,7 @@ SELECT WIDTH_BUCKET(6,ARRAY [2, 4, 6, 8]::INT[]);
  (要计算年龄的日期,生日)
  */
 SELECT AGE(TIMESTAMP '2001-01-01');
-SELECT AGE(TIMESTAMP '2010-02-02',TIMESTAMP '2001-01-01');
+SELECT AGE(TIMESTAMP '2010-02-02', TIMESTAMP '2001-01-01');
 
 /*
  返回此函数执行时的日期和时间
@@ -623,25 +623,25 @@ SELECT CURRENT_TIMESTAMP(2);
  将指定的时间戳截断到最近的指定的时间间隔的开始
  (时间间隔,要处理的时间,时间部分将会作为偏移量添加到结果时间上)
  */
-SELECT DATE_BIN('10 minutes',TIMESTAMP '2022-05-16 12:41:13',TIMESTAMP '2001-01-01');
+SELECT DATE_BIN('10 minutes', TIMESTAMP '2022-05-16 12:41:13', TIMESTAMP '2001-01-01');
 
 /*
  指定的时间戳或者时间间隔中抽取指定的部分并返回
  单位格式见 附4
  */
 -- 抽取世纪
-SELECT DATE_PART('century',TIMESTAMP '2022-05-16 12:41:13.662522');
+SELECT DATE_PART('century', TIMESTAMP '2022-05-16 12:41:13.662522');
 -- 抽取星期几
-SELECT DATE_PART('isodow',TIMESTAMP '2022-05-16 12:41:13.662522');
+SELECT DATE_PART('isodow', TIMESTAMP '2022-05-16 12:41:13.662522');
 
 /*
  将一个指定的时间戳或间隔值截断到指定的部分并返回
  单位格式见 附4
  */
 -- 截断到小时
-SELECT DATE_TRUNC('hour',TIMESTAMP '2022-05-16 12:41:13.662522');
+SELECT DATE_TRUNC('hour', TIMESTAMP '2022-05-16 12:41:13.662522');
 -- 截断到年
-SELECT DATE_TRUNC('year',TIMESTAMP '2022-05-16 12:41:13.662522');
+SELECT DATE_TRUNC('year', TIMESTAMP '2022-05-16 12:41:13.662522');
 
 /*
  从指定的时间戳或者时间间隔中抽取指定的部分并返回
@@ -696,15 +696,15 @@ SELECT LOCALTIMESTAMP(3);
  从给定的年、月、日字段创建一个日期
  (年,月,日)
  */
-SELECT MAKE_DATE(2022,5,16);
+SELECT MAKE_DATE(2022, 5, 16);
 -- 公元前(BC 表示公元前)
-SELECT MAKE_DATE(-2022,5,16);
+SELECT MAKE_DATE(-2022, 5, 16);
 
 /*
  从给定的年、月、日、时、分、秒字段创建一个间隔值
  (年,月,日,周,天,小时,分钟,秒)
  */
-SELECT MAKE_INTERVAL(1,2,3,4,5,6,1.123);
+SELECT MAKE_INTERVAL(1, 2, 3, 4, 5, 6, 1.123);
 -- 单独指定字段
 SELECT MAKE_INTERVAL(years => 2);
 
@@ -712,21 +712,21 @@ SELECT MAKE_INTERVAL(years => 2);
  从给定的时、分、秒字段创建一个时间
  (小时,分钟,秒)
  */
-SELECT MAKE_TIME(20,55,25.1231);
+SELECT MAKE_TIME(20, 55, 25.1231);
 
 /*
  从给定的年、月、日、时、分、秒字段创建一个时间戳值
  (年,月,日,时,分,秒)
  */
-SELECT MAKE_TIMESTAMP(2022,5,16,20,55,25.1231);
+SELECT MAKE_TIMESTAMP(2022, 5, 16, 20, 55, 25.1231);
 -- 公元前(BC 表示公元前)
-SELECT MAKE_TIMESTAMP(-2022,5,16,20,55,25.1231);
+SELECT MAKE_TIMESTAMP(-2022, 5, 16, 20, 55, 25.1231);
 
 /*
  从给定的年、月、日、时、分、秒、时区字段创建一个带有时区信息的时间戳值
  (年,月,日,时,分,秒,时区)
  */
-SELECT MAKE_TIMESTAMPTZ(2022,5,15,20,55,25.517606,'Asia/Shanghai');
+SELECT MAKE_TIMESTAMPTZ(2022, 5, 15, 20, 55, 25.517606, 'Asia/Shanghai');
 
 /*
  返回所属的事务开始时的系统日期和时间
@@ -768,7 +768,7 @@ SELECT TIMEOFDAY();
 /*
  根据给定的格式将指定的字符串转为一个日期值
  */
-SELECT TO_DATE('05 Dec 2000','DD Mon YYYY');
+SELECT TO_DATE('05 Dec 2000', 'DD Mon YYYY');
 
 /*
  将 Unix 纪元时间转为一个标准的带时区信息的时间戳
@@ -790,7 +790,7 @@ SELECT TRANSACTION_TIMESTAMP();
  */
 SELECT ARRAY_TO_JSON('{1, 2, 3, 4}'::INT[]);
 -- 美化
-SELECT ARRAY_TO_JSON('{1, 2, 3, 4}'::INT[],TRUE);
+SELECT ARRAY_TO_JSON('{1, 2, 3, 4}'::INT[], TRUE);
 
 /*
  将顶层 JSON 数组扩展为一个 JSON 值的集合
@@ -834,12 +834,12 @@ SELECT
 /*
  从可变的参数列表中创建一个可能是异构类型的 JSON 数组并返回
  */
-SELECT JSON_BUILD_ARRAY(1,'a',TRUE);
+SELECT JSON_BUILD_ARRAY(1, 'a', TRUE);
 
 /*
  从可变的参数列表（由交替的交替的键和值组成）中创建 JSON 对象并返回
  */
-SELECT JSON_BUILD_OBJECT(1,'a',TRUE,ROW (2, 'b', FALSE));
+SELECT JSON_BUILD_OBJECT(1, 'a', TRUE, ROW (2, 'b', FALSE));
 
 /*
  将一个指定的 JSON 对象扩展为一个键值对（键是文本类型,值是 JSON 类型）的集合
@@ -878,7 +878,7 @@ SELECT
         "x": 2,
         "y": 3
       }
-    }','a');
+    }', 'a');
 -- 提取嵌套
 SELECT
     JSON_EXTRACT_PATH('{
@@ -887,7 +887,7 @@ SELECT
         "x": 2,
         "y": 3
       }
-    }','b','y');
+    }', 'b', 'y');
 
 /*
  从一个指定的 JSON 值中提取指定的路径的值,并将结果作为文本返回
@@ -901,7 +901,7 @@ SELECT
         3,
         4
       ]
-    ]','0');
+    ]', '0');
 -- 提取嵌套
 SELECT
     JSON_EXTRACT_PATH_TEXT('{
@@ -910,7 +910,7 @@ SELECT
         "x": 2,
         "y": 3
       }
-    }','b','y');
+    }', 'b', 'y');
 
 /*
  从一个文本数组构建一个 JSON 对象,
@@ -922,7 +922,7 @@ SELECT JSON_OBJECT(ARRAY [1, 'a', TRUE, ROW (2, 'b', FALSE)]::TEXT[]);
 -- 从一个二维数组构建一个 JSON 对象
 SELECT JSON_OBJECT('{{1, 2}, {3, 4}, {a, 6}}');
 -- 从两个一维数组构建一个 JSON 对象
-SELECT JSON_OBJECT('{x, y}','{1, 2}');
+SELECT JSON_OBJECT('{x, y}', '{1, 2}');
 
 /*
  返回指定的 JSON 对象中的顶层键的集合
@@ -1133,12 +1133,12 @@ SELECT
 /*
  从可变的参数列表中创建一个可能是异构类型的 JSONB 数组并返回
  */
-SELECT JSONB_BUILD_ARRAY(1,'a',TRUE,ROW (2, 'b', FALSE));
+SELECT JSONB_BUILD_ARRAY(1, 'a', TRUE, ROW (2, 'b', FALSE));
 
 /*
  从可变的参数列表（由交替的交替的键和值组成）中创建 JSONB 对象并返回
  */
-SELECT JSONB_BUILD_OBJECT(1,'a',TRUE,ROW (2, 'b', FALSE));
+SELECT JSONB_BUILD_OBJECT(1, 'a', TRUE, ROW (2, 'b', FALSE));
 
 /*
  将一个指定的 JSONB 对象扩展为一个键值对（键是文本类型,值是 JSONB 类型）的集合
@@ -1177,7 +1177,7 @@ SELECT
         3,
         4
       ]
-    ]','0');
+    ]', '0');
 -- 提取嵌套
 SELECT
     JSONB_EXTRACT_PATH('{
@@ -1186,7 +1186,7 @@ SELECT
         "x": 2,
         "y": 3
       }
-    }','b','y');
+    }', 'b', 'y');
 
 /*
  从一个指定的 JSONB 对象中根据指定的路径提取 JSONB 子对象,并将结果作为文本返回
@@ -1200,7 +1200,7 @@ SELECT
         3,
         4
       ]
-    ]','0');
+    ]', '0');
 -- 提取嵌套
 SELECT
     JSONB_EXTRACT_PATH_TEXT('{
@@ -1209,7 +1209,7 @@ SELECT
         "x": 2,
         "y": 3
       }
-    }','b','y');
+    }', 'b', 'y');
 
 /*
  将一个新值插入到一个给定的 JSONB 值中通过路径指定的位置
@@ -1218,7 +1218,7 @@ SELECT
 SELECT
     JSONB_INSERT('{
       "x": 1
-    }','{y}','2');
+    }', '{y}', '2');
 SELECT
     JSONB_INSERT('{
       "x": 1,
@@ -1226,7 +1226,7 @@ SELECT
         1,
         2
       ]
-    }','{y, 0}','0',TRUE);
+    }', '{y, 0}', '0', TRUE);
 
 /*
  从一个文本数组构建一个 JSONB 对象,
@@ -1239,7 +1239,7 @@ SELECT JSONB_OBJECT(ARRAY [1, 'a', TRUE, ROW (2, 'b', FALSE)]::TEXT[]);
 -- 从一个二维数组构建一个 JSONB 对象
 SELECT JSONB_OBJECT('{{1, 2}, {3, 4}, {a, 6}}');
 -- 从两个一维数组构建一个 JSONB 对象
-SELECT JSONB_OBJECT('{x, y}','{1, 2}');
+SELECT JSONB_OBJECT('{x, y}', '{1, 2}');
 
 /*
  返回指定的 JSONB 对象中的顶层键的集合
@@ -1263,7 +1263,7 @@ SELECT
       1,
       2,
       3
-    ]','$[*] ? (@ > 1)');
+    ]', '$[*] ? (@ > 1)');
 
 /*
  在一个给定的 JSON 中检查一个指定的路径是否是否有返回值
@@ -1275,7 +1275,7 @@ SELECT
       1,
       2,
       3
-    ]','$[*] ? (@ > 1)');
+    ]', '$[*] ? (@ > 1)');
 -- 时区
 SELECT
     JSONB_PATH_EXISTS_TZ(
@@ -1294,7 +1294,7 @@ SELECT
       1,
       2,
       3
-    ]','exists($[*] ? (@ > 1))');
+    ]', 'exists($[*] ? (@ > 1))');
 
 /*
  返回一个 JSON 路径断言对一个指定的 JSON 值的执行结果
@@ -1306,7 +1306,7 @@ SELECT
       1,
       2,
       3
-    ]','exists($[*] ? (@ > 1))');
+    ]', 'exists($[*] ? (@ > 1))');
 -- 时区
 SELECT
     JSONB_PATH_MATCH_TZ(
@@ -1325,7 +1325,7 @@ SELECT
       1,
       2,
       3
-    ]','$[*] ? (@ > 1)');
+    ]', '$[*] ? (@ > 1)');
 
 /*
  在一个给定的 JSON 中根据指定的路径获取值,并将所有匹配的值作为一个数组返回
@@ -1336,7 +1336,7 @@ SELECT
       1,
       2,
       3
-    ]','$[*] ? (@ > 1)');
+    ]', '$[*] ? (@ > 1)');
 
 /*
  在一个给定的 JSON 中根据指定的路径获取值,并将所有匹配的值作为一个数组返回
@@ -1348,7 +1348,7 @@ SELECT
       1,
       2,
       3
-    ]','$[*] ? (@ > 1)');
+    ]', '$[*] ? (@ > 1)');
 -- 时区
 SELECT
     JSONB_PATH_QUERY_ARRAY_TZ(
@@ -1367,7 +1367,7 @@ SELECT
       1,
       2,
       3
-    ]','$[*] ? (@ > 1)');
+    ]', '$[*] ? (@ > 1)');
 
 /*
  在一个给定的 JSON 中根据指定的路径获取值,并返回第一个匹配的值
@@ -1379,7 +1379,7 @@ SELECT
       1,
       2,
       3
-    ]','$[*] ? (@ > 1)');
+    ]', '$[*] ? (@ > 1)');
 -- 时区
 SELECT
     JSONB_PATH_QUERY_FIRST_TZ(
@@ -1399,7 +1399,7 @@ SELECT
       1,
       2,
       3
-    ]','$[*] ? (@ > 1)');
+    ]', '$[*] ? (@ > 1)');
 -- 时区
 SELECT
     JSONB_PATH_QUERY_TZ(
@@ -1492,7 +1492,7 @@ SELECT
       0,
       1,
       2
-    ]','{1}','"x"');
+    ]', '{1}', '"x"');
 
 /*
  替换指定的路径上的值或者在指定的路径上插入值
@@ -1511,13 +1511,13 @@ SELECT
       0,
       1,
       2
-    ]','{1}','"x"');
+    ]', '{1}', '"x"');
 -- NULL 处理
 SELECT
     JSONB_SET_LAX('{
       "x": 1,
       "y": 2
-    }','{y}',NULL,TRUE,'delete_key');
+    }', '{y}', NULL, TRUE, 'delete_key');
 
 /*
  递归地删除对象中的值为 null 的字段,非对象字段的 null 值不处理
@@ -1591,7 +1591,7 @@ SELECT
  */
 SELECT ROW_TO_JSON(ROW ('Tom', 20, 'He likes sports.'));
 -- 美化
-SELECT ROW_TO_JSON(ROW ('Tom', 20, 'He likes sports.'),TRUE);
+SELECT ROW_TO_JSON(ROW ('Tom', 20, 'He likes sports.'), TRUE);
 
 /*
  将一个 SQL 值转为 JSON 值并返回
@@ -1616,13 +1616,13 @@ SELECT
  将指定的元素追加到指定的数组的最后并返回修改后的数组
  (要追加元素的数组,要追加的元素)
  */
-SELECT ARRAY_APPEND(ARRAY [0, 1, 2],3);
+SELECT ARRAY_APPEND(ARRAY [0, 1, 2], 3);
 
 /*
  将两个指定的数组连接为一个数组并返回连接后的数组
  (要连接的数组,要连接的数组)
  */
-SELECT ARRAY_CAT(ARRAY [0, 1, 2],ARRAY [3, 4, 5]);
+SELECT ARRAY_CAT(ARRAY [0, 1, 2], ARRAY [3, 4, 5]);
 
 /*
  返回一个表示指定的数组的维度的文本
@@ -1633,25 +1633,25 @@ SELECT ARRAY_DIMS(ARRAY [0, 1, 2]);
  返回一个填充了指定的元素的数组
  (要填充的元素,返回一个填充了指定的元素的数组,开始填充数据的起始下标)
  */
-SELECT ARRAY_FILL(1,ARRAY [5]);
+SELECT ARRAY_FILL(1, ARRAY [5]);
 -- 多维数组
-SELECT ARRAY_FILL(1,ARRAY [3, 2]);
+SELECT ARRAY_FILL(1, ARRAY [3, 2]);
 
 /*
  返回指定的数组中指定维度的长度
  (数组,数组的维度)
  */
-SELECT ARRAY_LENGTH(ARRAY [0, 1, 2],1);
+SELECT ARRAY_LENGTH(ARRAY [0, 1, 2], 1);
 -- 多维数组
-SELECT ARRAY_LENGTH(ARRAY [[1,2], [3,4], [5,6]],2);
+SELECT ARRAY_LENGTH(ARRAY [[1,2], [3,4], [5,6]], 2);
 
 /*
  返回指定的数组中指定维度的起始索引
  (数组,数组的维度)
  */
-SELECT ARRAY_LOWER(ARRAY [0, 1, 2],1);
+SELECT ARRAY_LOWER(ARRAY [0, 1, 2], 1);
 
-SELECT ARRAY_LOWER('[3:7]={1,1,1,1,1}'::INTEGER[],1);
+SELECT ARRAY_LOWER('[3:7]={1,1,1,1,1}'::INTEGER[], 1);
 
 /*
  返回指定的数组的维度数
@@ -1664,50 +1664,50 @@ SELECT ARRAY_NDIMS(ARRAY [[1,2], [3,4], [5,6]]);
  在一个指定的数组中查找指定的元素,并返回第一次出现的下标
  (要查找的数组,要查找的元素,开始查找的起始下标)
  */
-SELECT ARRAY_POSITION(ARRAY [0, 1, 2],1);
+SELECT ARRAY_POSITION(ARRAY [0, 1, 2], 1);
 -- 指定起始下标
-SELECT ARRAY_POSITION(ARRAY [0, 1, 2, 3, 5],2,2);
+SELECT ARRAY_POSITION(ARRAY [0, 1, 2, 3, 5], 2, 2);
 
 /*
  在一个指定的数组中查找指定的元素,
  并返回由所有出现的下标组成的数组
  (要查找的数组,要查找的元素)
  */
-SELECT ARRAY_POSITIONS(ARRAY [0, 1, 2, 1],1);
+SELECT ARRAY_POSITIONS(ARRAY [0, 1, 2, 1], 1);
 
 /*
  将指定的元素添加到指定的数组的开头并返回修改后的数组
  (要添加的元素,要添加元素的数组)
  */
-SELECT ARRAY_PREPEND(0,ARRAY [1, 2, 3]);
+SELECT ARRAY_PREPEND(0, ARRAY [1, 2, 3]);
 
 /*
  从指定的数组中删除所有指定的元素并返回修改后的数组\
  (要删除元素的数组,要删除的元素)
  */
-SELECT ARRAY_REMOVE(ARRAY [0, 1, 2, 1],1);
+SELECT ARRAY_REMOVE(ARRAY [0, 1, 2, 1], 1);
 
 /*
  在指定的数组中使用一个新元素替换指定的元素并返回修改后的数组
  (要替换元素的数组,要替换的元素,要替换的新元素)
  */
-SELECT ARRAY_REPLACE(ARRAY [2, 1, 2, 1],2,1);
+SELECT ARRAY_REPLACE(ARRAY [2, 1, 2, 1], 2, 1);
 
 /*
  将数组中的所有元素使用分隔符连接起来并返回结果
  (要连接的数组,分隔符,NULL 值的替代文本)
  */
-SELECT ARRAY_TO_STRING(ARRAY [1, 2, 3],' - ');
+SELECT ARRAY_TO_STRING(ARRAY [1, 2, 3], ' - ');
 -- NULL 值的替代文本
-SELECT ARRAY_TO_STRING(ARRAY [1, 2, NULL, 3],' - ','!');
+SELECT ARRAY_TO_STRING(ARRAY [1, 2, NULL, 3], ' - ', '!');
 
 /*
  返回指定的数组中指定维度的最大索引
  (数组,数组的维度)
  */
-SELECT ARRAY_UPPER(ARRAY [0, 1, 2],1);
+SELECT ARRAY_UPPER(ARRAY [0, 1, 2], 1);
 -- 多维数组
-SELECT ARRAY_UPPER(ARRAY [[1,2], [3,4], [5,6]],2);
+SELECT ARRAY_UPPER(ARRAY [[1,2], [3,4], [5,6]], 2);
 
 /*
  返回数组中的所有的元素的总数
@@ -1720,7 +1720,7 @@ SELECT CARDINALITY(ARRAY [[1,2], [3,4], [5,6]]);
  从指定的数组的最后删除指定数量的元素并返回修改后的数组
  (要删除元素的数组,要删除的元素的数量)
  */
-SELECT TRIM_ARRAY(ARRAY [0, 1, 2, 1],1);
+SELECT TRIM_ARRAY(ARRAY [0, 1, 2, 1], 1);
 
 /*
  将指定的数组展开为一个行的集合
@@ -1754,7 +1754,7 @@ SELECT AREA(PATH '((0,0),(1,1),(1,0),(0,0))');
 /*
  返回两个指定矩形的边界矩形
  */
-SELECT BOUND_BOX(BOX '(4,4),(3,3)',BOX '(1,1),(0,0)');
+SELECT BOUND_BOX(BOX '(4,4),(3,3)', BOX '(1,1),(0,0)');
 
 /*
  计算并返回一个指定的圆的内切的矩形
@@ -1764,7 +1764,7 @@ SELECT BOX(CIRCLE '((0,0),2)');
 /*
  将任意两个点转换为一个矩形并返回
  */
-SELECT BOX(POINT '(1,1)',POINT '(2,2)');
+SELECT BOX(POINT '(1,1)', POINT '(2,2)');
 
 /*
  将任意一个点转换为一个空的矩形
@@ -1788,7 +1788,7 @@ SELECT CENTER(CIRCLE '((0,0),2)');
  通过圆心点和半径构造一个圆形
  */
 -- 圆点 1,1 半径 1
-SELECT CIRCLE(POINT '(1,1)',1);
+SELECT CIRCLE(POINT '(1,1)', 1);
 
 /*
  返回包围指定的矩形的最小的圆形
@@ -1841,7 +1841,7 @@ SELECT LENGTH(PATH '((2,0),(0,0))');
 /*
  返回穿过两个指定的点的直线
  */
-SELECT LINE(POINT '(4,4)',POINT '(0,0)');
+SELECT LINE(POINT '(4,4)', POINT '(0,0)');
 
 /*
  提取指定矩形的对角线并作为线段返回
@@ -1851,7 +1851,7 @@ SELECT LSEG(BOX '(1,1),(0,0)');
 /*
  根据两个指定的点构造一个线段并返回
  */
-SELECT LSEG(POINT '(4,4)',POINT '(0,0)');
+SELECT LSEG(POINT '(4,4)', POINT '(0,0)');
 
 /*
  计算指定的路径或多边形上的点的数量并返回
@@ -1873,7 +1873,7 @@ SELECT PCLOSE(PATH '[(0,0),(1,1),(2,0)]');
  根据参数指定的坐标构造一个点并返回
  (一个点的横坐标,一个点的纵坐标)
  */
-SELECT POINT(0,0);
+SELECT POINT(0, 0);
 
 /*
  计算指定的矩形的中心点并返回
@@ -1910,7 +1910,7 @@ SELECT POLYGON(CIRCLE '<(0,0),2>');
  将一个圆形转成一个由指定数量的点表示的多边形并返回
  (指定的点的数量,圆形)
  */
-SELECT POLYGON(3,CIRCLE '<(0,0),2>');
+SELECT POLYGON(3, CIRCLE '<(0,0),2>');
 
 /*
  将一个闭合的路径转成一个具有相同点数的多边形并返回
@@ -1930,7 +1930,7 @@ SELECT RADIUS(CIRCLE '<(0,0),2>');
 /*
  计算穿过两个指定的点的直线的斜率并返回
  */
-SELECT SLOPE(POINT '(4,4)',POINT '(0,0)');
+SELECT SLOPE(POINT '(4,4)', POINT '(0,0)');
 
 /*
  返回指定矩形的横向宽度
@@ -1990,7 +1990,7 @@ CREATE SEQUENCE seq START 100;
 SELECT NEXTVAL('seq');
 
 -- 重置指定序列的当前值
-SELECT SETVAL('seq',1);
+SELECT SETVAL('seq', 1);
 
 -- 查询当前会话中指定序列的当前值
 SELECT CURRVAL('seq');
@@ -1999,13 +1999,126 @@ DROP SEQUENCE seq;
 /* 枚举类型函数 */
 
 -- 操作用枚举类型的值
-
+CREATE TYPE WEEK AS ENUM ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
 
 /*
  返回由参数指定的枚举类型的第一个枚举值
  */
+SELECT ENUM_FIRST(NULL::WEEK);
+
+/*
+ 返回由参数指定的枚举类型的最后一个枚举值
+ */
+SELECT ENUM_LAST(NULL::WEEK);
+
+/*
+ 返回由参数指定的枚举类型的所有枚举值,或者指定的范围内的枚举值
+ (一个枚举值)
+ (枚举范围的起始值,枚举范围的结束值)
+ */
+-- 返回所有
+SELECT ENUM_RANGE(NULL::WEEK);
+-- 返回指定范围
+SELECT ENUM_RANGE('Monday'::WEEK, 'Wednesday'::WEEK);
+
+/* 返回集合的函数 */
+
+/*
+ 根据指定的开始值、结束值和步长返回一个基于系列的集合
+ (起始值,结束值,步长)
+ */
+-- 步长默认为1
+SELECT GENERATE_SERIES(1, 5);
+-- 指定步长
+SELECT GENERATE_SERIES(1, 10, 1.5);
+
+/*
+ 根据指定的数组和维度返回由数组下标组成的集合
+ (任意类型的数组,数组的维度,是否逆序)
+ */
+SELECT GENERATE_SUBSCRIPTS('{3, 4, 5, 7}'::INT[], 1);
+-- 逆序
+SELECT GENERATE_SUBSCRIPTS('{3, 4, 5, 7}'::INT[], 1, TRUE);
+-- 多维数组
+SELECT GENERATE_SUBSCRIPTS('{{1,2}, {3,4}}'::INT[][], 2);
 
 
+/* 范围函数 */
+
+/*
+ 检查一个给定的范围值是否为空
+ (范围值)
+ (多值范围值)
+ */
+-- 空范围
+SELECT ISEMPTY('(1, 1)'::INT4RANGE);
+-- 非空范围
+SELECT ISEMPTY('(1, 2]'::INT4RANGE);
+
+/*
+ 检查一个给定范围的下限是否是包含在内的
+ (范围值)
+ (多值范围值)
+ */
+-- 非空范围
+SELECT LOWER_INC('[1, 4]'::INT4RANGE);
+-- 空范围
+SELECT LOWER_INC('(1, 1)'::INT4RANGE);
+
+/*
+ 检查一个给定范围的下限是否是无穷小
+ (范围值)
+ (多值范围值)
+ */
+SELECT LOWER_INF('(, 5)'::INT4RANGE);
+
+/*
+ 返回一个给定范围或者多值范围的下限值
+ (范围值)
+ (多值范围值)
+ */
+SELECT LOWER('[1, 4]'::INT4RANGE);
+SELECT LOWER('(1, 4]'::INT4RANGE);
+
+/*
+ 返回一个包含了给定范围的多值范围
+ */
+SELECT multirange('(1, 3)'::INT4RANGE);
+
+/*
+ 计算包含了所有范围或者整个多值范围的最小范围
+ (范围值)
+ (多值范围值)
+ */
+SELECT RANGE_MERGE('(1, 3)'::INT4RANGE, '(4, 7)'::INT4RANGE);
+
+/*
+ 将一个多值范围值展开为范围值的集合
+ */
+SELECT UNNEST('{(1, 3), [10, 20], [5,7]}'::INT4MULTIRANGE);
+
+/*
+ 检查一个给定范围的上限是否是包含在内的
+ (范围值)
+ (多值范围值)
+ */
+SELECT UPPER_INC('[1, 4]'::INT4RANGE);
+
+/*
+ 检查一个给定范围的上限是否是无穷大
+ (范围值)
+ (多值范围值)
+ */
+SELECT UPPER_INF('(1,)'::INT4RANGE);
+
+/*
+ 返回一个给定范围或者多值范围的上限
+ (范围值)
+ (多值范围值)
+ */
+SELECT UPPER('[1, 3]'::INT4RANGE);
+-- 空范围返回NULL
+SELECT UPPER('(1, 1)'::INT4RANGE);
 
 
 
