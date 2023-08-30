@@ -2670,7 +2670,7 @@ FROM
  */
 SELECT
     t.name,
-    range_agg(t.range_value) range_agg
+    RANGE_AGG(t.range_value) range_agg
 FROM
     (
         SELECT
@@ -2697,7 +2697,7 @@ GROUP BY
  */
 SELECT
     t.name,
-    range_intersect_agg(t.range_value) range_intersect_agg
+    RANGE_INTERSECT_AGG(t.range_value) range_intersect_agg
 FROM
     (
         SELECT
@@ -2785,3 +2785,22 @@ SELECT
     VARIANCE(age)
 FROM
     student_information;
+
+/*
+ 连接非空 XML 输入值
+ */
+SELECT
+    XMLAGG(
+            XMLELEMENT(
+                    NAME "student",
+                    XMLFOREST(
+                            name,
+                            age
+                        )
+                )
+        )
+FROM
+    student_information;
+
+
+
