@@ -2507,8 +2507,281 @@ SELECT USER;
 SELECT VERSION();
 
 
+/* 聚合函数 */
+-- 聚合函数操作表
+CREATE TABLE student_information
+(
+    id       SERIAL PRIMARY KEY,
+    -- 学生姓名
+    name     VARCHAR(50) NOT NULL,
+    -- 班级
+    class    CHAR(1)     NOT NULL,
+    -- 籍贯
+    hometown VARCHAR(20) NOT NULL,
+    -- 年龄
+    age      INT         NOT NULL
+);
+INSERT
+INTO
+    student_information
+    (name, class, hometown, age)
+VALUES
+    ('Tim', 'A', 'Beijing', 18),
+    ('Tom', 'A', 'Shanghai', 19),
+    ('Jim', 'A', 'Guangzhou', 20),
+    ('Lucy', 'B', 'Beijing', 18),
+    ('Jody', 'B', 'Shanghai', 19),
+    ('Susy', 'B', 'Guangzhou', 20);
 
+/*
+ 返回一个包含了一个分组中的所有的值的组成的数组
+ */
+-- 按照籍贯分组而来的学生姓名数组
+SELECT
+    hometown,
+    ARRAY_AGG(name)
+FROM
+    student_information
+GROUP BY
+    hometown;
 
+/*
+ 计算一个分组中的所有指定的值的平均值并返回
+ */
+-- 平均年龄
+SELECT
+    AVG(age)
+FROM
+    student_information;
 
+/*
+ 对所有的非 null 输入值执行"按位与"运算
+ */
+SELECT
+    BIT_AND(age)
+FROM
+    student_information;
 
+/*
+ 对所有的非 null 输入值执行"按位或"运算
+ */
+SELECT
+    BIT_OR(age)
+FROM
+    student_information;
 
+/*
+ 对所有的非 null 输入值执行"按位异或"运算
+ */
+SELECT
+    BIT_XOR(age)
+FROM
+    student_information;
+
+/*
+ 返回一个分组中的所有指定的非 null 的布尔值"逻辑与"运算后的结果
+ */
+SELECT
+    BOOL_AND(age > 18)
+FROM
+    student_information;
+
+/*
+ 返回一个分组中的所有指定的非 null 的布尔值"逻辑或"运算后的结果
+ */
+SELECT
+    BOOL_OR(age > 18)
+FROM
+    student_information;
+
+/*
+ 统计一个分组中的所有指定的值的数量并返回
+ */
+-- 统计学生的数量
+SELECT
+    COUNT(*)
+FROM
+    student_information;
+
+/*
+ 返回一个分组中的所有指定的非 null 的布尔值"逻辑与"运算后的结果
+ */
+SELECT
+    EVERY(age > 18)
+FROM
+    student_information;
+
+/*
+ 返回一个包含了一个分组中的所有的值的组成的 JSON 数组
+ */
+SELECT
+    hometown,
+    JSON_AGG(name)
+FROM
+    student_information
+GROUP BY
+    hometown;
+
+/*
+ 返回一个由一组键值对组成的 JSON 对象
+ */
+SELECT
+    JSON_BUILD_OBJECT('name', name, 'age', age)
+FROM
+    student_information;
+
+/*
+ 返回一个包含了一个分组中的所有的值的组成的 JSON 数组
+ */
+SELECT
+    hometown,
+    JSON_OBJECT_AGG(name, age)
+FROM
+    student_information
+GROUP BY
+    hometown;
+
+/*
+ 返回一个由一组键值对组成的 JSON 对象
+ */
+SELECT
+    JSONB_OBJECT_AGG(hometown, age)
+FROM
+    student_information;
+
+/*
+ 返回一个分组中的所有指定的值中的最大值
+ */
+SELECT
+    MAX(age)
+FROM
+    student_information;
+
+/*
+ 返回一个分组中的所有指定的值中的最小值
+ */
+SELECT
+    MIN(age)
+FROM
+    student_information;
+
+/*
+ 返回一个分组中所有非 NULL 输入范围值的合集
+ */
+SELECT
+    t.name,
+    range_agg(t.range_value) range_agg
+FROM
+    (
+        SELECT
+            'Tim'              name,
+            '[3,7)'::INT4RANGE range_value
+        UNION
+        SELECT
+            'Tim'               name,
+            '[8,10]'::INT4RANGE range_value
+        UNION
+        SELECT
+            'Tom'              name,
+            '(3,7)'::INT4RANGE range_value
+        UNION
+        SELECT
+            'Tom'              name,
+            '[4,9)'::INT4RANGE range_value
+    ) t
+GROUP BY
+    t.name;
+
+/*
+ 返回一个分组中所有非 NULL 输入范围值的交集
+ */
+SELECT
+    t.name,
+    range_intersect_agg(t.range_value) range_intersect_agg
+FROM
+    (
+        SELECT
+            'Tim'              name,
+            '[3,7)'::INT4RANGE range_value
+        UNION
+        SELECT
+            'Tim'               name,
+            '[8,10]'::INT4RANGE range_value
+        UNION
+        SELECT
+            'Tom'              name,
+            '(3,7)'::INT4RANGE range_value
+        UNION
+        SELECT
+            'Tom'              name,
+            '[4,9)'::INT4RANGE range_value
+    ) t
+GROUP BY
+    t.name;
+
+/*
+ 计算所有非 null 输入值的样本标准差
+ */
+SELECT
+    STDDEV(age)
+FROM
+    student_information;
+
+/*
+ 计算所有非 null 输入值的总体标准差
+ */
+SELECT
+    STDDEV_POP(age)
+FROM
+    student_information;
+
+/*
+ 计算所有非 null 输入值的样本标准差
+ */
+SELECT
+    STDDEV_SAMP(age)
+FROM
+    student_information;
+
+/*
+ 返回一个包含了一个分组中的所有的指定的值组成的字符串
+ */
+SELECT
+    hometown,
+    STRING_AGG(name, ',')
+FROM
+    student_information
+GROUP BY
+    hometown;
+
+/*
+ 计算一个分组中的所有指定的值的总和并返回
+ */
+SELECT
+    SUM(age)
+FROM
+    student_information;
+
+/*
+ 计算所有非 null 输入值的总体方差（总体标准差的平方）
+ */
+SELECT
+    VAR_POP(age)
+FROM
+    student_information;
+
+/*
+ 计算所有非 null 输入值的样本方差（样本标准差的平方）
+ */
+SELECT
+    VAR_SAMP(age)
+FROM
+    student_information;
+
+/*
+ 计算所有非 null 输入值的样本方差（样本标准差的平方）
+ */
+SELECT
+    VARIANCE(age)
+FROM
+    student_information;
