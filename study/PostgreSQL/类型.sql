@@ -71,18 +71,18 @@ INTO
 VALUES;
 
 -- 浮点类型
-CREATE TABLE type_float
+CREATE TABLE type_double
 (
     -- 单精度浮点数
-    real  REAL ,
+    real   REAL ,
     -- 双精度浮点数
-    float FLOAT
+    double DOUBLE PRECISION
 );
 
 -- 插入
 INSERT
 INTO
-    type_float
+    type_double
 VALUES
     (1.23 , 4.56);
 
@@ -291,7 +291,7 @@ INSERT
 INTO
     type_point
 VALUES
-    (POINT(1,2));
+    (POINT(1, 2));
 
 -- 创建点
 INSERT
@@ -319,7 +319,7 @@ INSERT
 INTO
     type_line
 VALUES
-    (LINE(POINT(1,2),POINT(3,4)));
+    (LINE(POINT(1, 2), POINT(3, 4)));
 
 -- 创建线
 INSERT
@@ -347,7 +347,7 @@ INSERT
 INTO
     type_lseg
 VALUES
-    (LSEG(POINT(1,2),POINT(3,4)));
+    (LSEG(POINT(1, 2), POINT(3, 4)));
 
 -- 创建线段
 INSERT
@@ -374,7 +374,7 @@ INSERT
 INTO
     type_box
 VALUES
-    (BOX(POINT(1,2),POINT(3,4)));
+    (BOX(POINT(1, 2), POINT(3, 4)));
 
 -- 创建矩形
 INSERT
@@ -623,7 +623,7 @@ CREATE TYPE MY_RANGE AS RANGE
     SUBTYPE = TIME
 );
 
-SELECT MY_RANGE('10:00','11:00') @> '10:30'::TIME;
+SELECT MY_RANGE('10:00', '11:00') @> '10:30'::TIME;
 
 
 /* HSTORE 键值对 */
@@ -680,3 +680,29 @@ VALUES
     -- 小于18会报错
     -- 必须通过自定义域类型的检查约束
     (20);
+
+/* 引用文本类型 */
+-- 通常用于存储忽略大小写的文本
+-- 进行文本比较时,不必考虑大小写
+-- 开启扩展
+CREATE EXTENSION citext;
+-- 关闭扩展
+DROP EXTENSION citext;
+-- 创建表
+CREATE TABLE type_citext
+(
+    -- 引用文本类型
+    citext CITEXT
+);
+-- 插入
+INSERT
+INTO
+    type_citext
+VALUES
+    ('abc');
+-- 查询
+SELECT *
+FROM
+    type_citext
+WHERE
+    citext = 'ABC';

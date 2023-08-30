@@ -953,14 +953,14 @@ SELECT
 -- 自定义SQL类型
 CREATE TYPE ADDRESS AS
 (
-    country TEXT ,
+    country TEXT,
     city    TEXT
 );
 CREATE TYPE PERSON AS
 (
-    name    TEXT ,
-    age     INT ,
-    hobbies TEXT[] ,
+    name    TEXT,
+    age     INT,
+    hobbies TEXT[],
     address ADDRESS
 );
 -- 转换
@@ -989,8 +989,8 @@ FROM
 -- 自定义SQL类型
 CREATE TYPE MY_TYPE AS
 (
-    x TEXT ,
-    y INT ,
+    x TEXT,
+    y INT,
     z TEXT
 );
 -- 转换
@@ -1013,7 +1013,7 @@ FROM
 SELECT *
 FROM
     JSON_POPULATE_RECORDSET(
-            ( 'x' , 0 , 'z' )::MY_TYPE,
+            ( 'x', 0, 'z' )::MY_TYPE,
             '[
               {
                 "x": "A",
@@ -1054,7 +1054,7 @@ FROM
                 "cars"
               ]
             }'
-        ) AS x( name TEXT , age INT , hobbies TEXT[] );
+        ) AS x( name TEXT, age INT, hobbies TEXT[] );
 
 /*
  将指定的最顶层的 JSON 数组（元素为对象）扩展为一个在 AS 子句中定义的具有符合类型的行的集合
@@ -1072,7 +1072,7 @@ FROM
                 "y": 2
               }
             ]'
-        ) AS x( x TEXT , y INT );
+        ) AS x( x TEXT, y INT );
 
 /*
  以字符串的形式返回指定的 JSON 值的类型
@@ -1456,7 +1456,7 @@ FROM
 SELECT *
 FROM
     JSONB_POPULATE_RECORDSET(
-            ( 'x' , 0 , 'z' )::MY_TYPE,
+            ( 'x', 0, 'z' )::MY_TYPE,
             '[
               {
                 "x": "A",
@@ -1547,7 +1547,7 @@ FROM
                 "cars"
               ]
             }'
-        ) AS x( name TEXT , age INT , hobbies TEXT[] );
+        ) AS x( name TEXT, age INT, hobbies TEXT[] );
 
 /*
  将指定的最顶层的 JSONB 数组（元素为对象）扩展为一个在 AS 子句中定义的具有符合类型的行的集合
@@ -1565,7 +1565,7 @@ FROM
                 "y": 2
               }
             ]'
-        ) AS x( x TEXT , y INT );
+        ) AS x( x TEXT, y INT );
 
 /*
  以字符串的形式返回指定的 JSONB 值的类型
@@ -1735,7 +1735,7 @@ FROM
             ARRAY [1, 2, 3, 4],
             ARRAY ['a', 'b', 'c'],
             ARRAY ['A', 'B', 'C', 'D']
-        ) AS x( x , y , z );
+        ) AS x( x, y, z );
 
 
 /* 几何函数 */
@@ -2119,6 +2119,392 @@ SELECT UPPER_INF('(1,)'::INT4RANGE);
 SELECT UPPER('[1, 3]'::INT4RANGE);
 -- 空范围返回NULL
 SELECT UPPER('(1, 1)'::INT4RANGE);
+
+
+/* 窗口函数 */
+-- 窗口函数操作表
+-- 学生表
+CREATE TABLE student_grade
+(
+    id      SERIAL PRIMARY KEY,
+    -- 学生姓名
+    name    VARCHAR(50) NOT NULL,
+    -- 班级
+    class   CHAR(1)     NOT NULL,
+    -- 科目
+    subject VARCHAR(20) NOT NULL,
+    -- 成绩
+    grade   INT         NOT NULL
+);
+INSERT
+INTO
+    student_grade
+    (name, class, subject, grade)
+VALUES
+    ('Tim', 'A', 'Math', 9),
+    ('Tom', 'A', 'Math', 7),
+    ('Jim', 'A', 'Math', 8),
+    ('Tim', 'A', 'English', 7),
+    ('Tom', 'A', 'English', 8),
+    ('Jim', 'A', 'English', 7),
+    ('Lucy', 'B', 'Math', 8),
+    ('Jody', 'B', 'Math', 6),
+    ('Susy', 'B', 'Math', 9),
+    ('Lucy', 'B', 'English', 6),
+    ('Jody', 'B', 'English', 7),
+    ('Susy', 'B', 'English', 8);
+-- 查询所有
+SELECT *
+FROM
+    student_grade;
+-- 税收表
+CREATE TABLE tax_revenue
+(
+    id      SERIAL PRIMARY KEY,
+    -- 年份
+    year    CHAR(4) NOT NULL,
+    -- 季度
+    quarter CHAR(1) NOT NULL,
+    -- 税收
+    revenue INT     NOT NULL
+);
+INSERT
+INTO
+    tax_revenue
+    (year, quarter, revenue)
+VALUES
+    ('2020', '1', 3515),
+    ('2020', '2', 3678),
+    ('2020', '3', 4203),
+    ('2020', '4', 3924),
+    ('2021', '1', 3102),
+    ('2021', '2', 3293),
+    ('2021', '3', 3602),
+    ('2021', '4', 2901);
+-- 查询所有
+SELECT *
+FROM
+    tax_revenue;
+
+
+/*
+ 返回当前行的累积分布,
+ 即从第一行到与当前行值相同的最后一行的行数在分区内的总行数中的占比
+ (参与分区的列的列表,参与排序的列的列表)
+ 返回值:(当前行之前的行数 + 与当前行值相同的行数) / 分区内的总行数
+ */
+-- 按科目分组计算每个学生的成绩在每组中的累积分布
+SELECT *,
+       CUME_DIST() OVER (
+           PARTITION BY subject
+           ORDER BY grade
+           )
+FROM
+    student_grade;
+
+/*
+ 返回当前行所在的分区内的排名,
+ 从 1 开始,但没有间隔
+ 相同的值具有相同的排名,但是下一个不同的值的排名按顺序增加 1
+ (参与分区的列的列表,参与排序的列的列表)
+ */
+-- 按照科目查看每个学生的成绩排名
+SELECT *,
+       DENSE_RANK() OVER (
+           PARTITION BY subject
+           ORDER BY grade DESC
+           )
+FROM
+    student_grade;
+-- 按照班级查看每个学生的总成绩排名
+SELECT
+    t.*,
+    DENSE_RANK() OVER (
+        PARTITION BY class
+        ORDER BY t.sum_grade DESC
+        )
+FROM
+    (
+        SELECT
+            class,
+            name,
+            SUM(grade) sum_grade
+        FROM
+            student_grade
+        GROUP BY
+            class,
+            name
+    ) t;
+
+/*
+ 从当前行关联的窗口框架的第一行中返回评估的值
+ (一个列名或者表达式,参与分区的列的列表,参与排序的列的列表)
+ */
+-- 查看在每个科目中每个学生按照成绩从高到低的排序号和每个科目中的最好成绩
+SELECT *,
+       FIRST_VALUE(grade) OVER (
+           PARTITION BY subject
+           ORDER BY grade DESC
+           )
+FROM
+    student_grade;
+
+/*
+ 返回来自当前行所在的分区内当前行之前的指定行之内的行的值
+ (一个列名或者表达式,相对于当前行的偏移的行数,一个列名或者表达式,参与排序的列的列表,指定的行数)
+ */
+-- 和上一季度的收益比较
+SELECT *,
+       LAG(revenue, 1) OVER (
+           PARTITION BY year
+           ORDER BY quarter
+           ) next_quarter_revenue
+FROM
+    tax_revenue;
+
+/*
+ 从当前行关联的窗口框架的最后一行中返回评估的值
+ (一个列名或者表达式,参与分区的列的列表,参与排序的列的列表)
+ */
+-- 查看在每个科目中每个学生按照成绩从高到低的排序号和每个科目中的最差成绩
+SELECT *,
+       LAST_VALUE(grade) OVER (
+           PARTITION BY subject
+           ORDER BY grade DESC
+           RANGE BETWEEN
+               UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+           ) last_grade
+FROM
+    student_grade;
+
+/*
+ 返回来自当前行所在的分区内当前行之后的指定行之内的值
+ (一个列名或者表达式,相对于当前行的偏移的行数,一个列名或者表达式,参与排序的列的列表,指定的行数)
+ */
+-- 和下一季度的收益比较
+SELECT *,
+       LEAD(revenue, 1) OVER (
+           PARTITION BY year
+           ORDER BY quarter
+           ) last_quarter_revenue
+FROM
+    tax_revenue;
+
+/*
+ 从当前行关联的窗口框架的指定的一行中返回评估的值
+ (一个列名或者表达式,指定行的编号,参与分区的列的列表,参与排序的列的列表)
+ */
+-- 查看在每个科目中每个学生按照成绩从高到低的排序号和每个科目中的最好成绩
+SELECT *,
+       NTH_VALUE(grade, 1) OVER (
+           PARTITION BY subject
+           ORDER BY grade DESC
+           RANGE BETWEEN
+               UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+           ) first_grade
+FROM
+    student_grade;
+
+/*
+ 将当前行所在的分区内的所有行尽可能平均的分成指定数量的区间,
+ 并返回当前行所在的区间编号
+ 每个区间,PostgreSQL 称之为一个排名桶,
+ 根据指定排序为每个桶指设定排名
+ (桶的数量,参与分区的列的列表,参与排序的列的列表)
+ */
+-- 将 1 到 9 分成 3 个桶
+SELECT
+    x,
+    NTILE(3) OVER (
+        ORDER BY x
+        )
+FROM
+    GENERATE_SERIES(1, 9) x;
+-- 将每年的收益按照升序分成 2 桶
+SELECT *,
+       NTILE(2) OVER (
+           PARTITION BY year
+           ORDER BY revenue
+           )
+FROM
+    tax_revenue;
+
+/*
+ 返回当前行所在的分区内的排名，从 1 开始,但有间隔
+ 相同的值具有相同的排名，但是下一个不同的值的排名采用下一个整数
+ (参与分区的列的列表,参与排序的列的列表)
+ */
+SELECT *,
+       RANK() OVER (
+           PARTITION BY subject
+           ORDER BY grade DESC
+           )
+FROM
+    student_grade;
+
+/*
+ 返回当前行所在的分区内的序号,从 1 开始
+ (参与分区的列的列表,参与排序的列的列表)
+ */
+SELECT *,
+       ROW_NUMBER() OVER (
+           PARTITION BY subject
+           ORDER BY grade DESC
+           )
+FROM
+    student_grade;
+
+/*
+ 返回当前行所在的分区内的相对排名,
+ 也就是 (rank() - 1) / (分区总行数 - 1)
+ (参与分区的列的列表,参与排序的列的列表)
+ */
+SELECT *,
+       PERCENT_RANK() OVER (
+           PARTITION BY subject
+           ORDER BY grade DESC
+           )
+FROM
+    student_grade;
+
+
+/* 会话信息函数 */
+
+/*
+ 返回当前数据库的名称
+ */
+SELECT CURRENT_CATALOG;
+
+/*
+ 返回当前数据库的名称
+ */
+SELECT CURRENT_DATABASE();
+
+/*
+ 返回由当前客户端提交的正在执行的一个或多个语句
+ */
+SELECT CURRENT_QUERY();
+
+/*
+ 返回当前模式的名称
+ 即当前查询架构
+ */
+SELECT CURRENT_SCHEMA();
+
+/*
+ 按照优先级顺序返回当前有效搜索路径上的所有的架构名称
+ (是否包含隐式的系统模式)
+ */
+SELECT CURRENT_SCHEMAS(FALSE);
+
+/*
+ 返回当前用户(当前执行上下文的用户)的名称
+ */
+SELECT CURRENT_USER;
+
+/*
+ 返回当前客户端的 IP 地址,
+ 如果当前连接通过 Unix 套接字连接,
+ 则返回 NULL
+ */
+SELECT INET_CLIENT_ADDR();
+
+/*
+ 返回当前客户端的 IP 端口号
+ */
+SELECT INET_CLIENT_PORT();
+
+/*
+ 返回接受当前连接的服务器的 IP 地址,
+ 如果当前连接通过 Unix 套接字连接,则返回 NULL
+ */
+SELECT INET_SERVER_ADDR();
+
+/*
+ 返回接受当前连接的服务器的端口号
+ */
+SELECT INET_SERVER_PORT();
+
+/*
+ 返回当前会话连接的服务端进程的进程 ID
+ */
+SELECT PG_BACKEND_PID();
+
+/*
+ 返回阻止指定的会话获取锁的会话的进程 ID 列表
+ */
+SELECT PG_BLOCKING_PIDS(20448);
+
+/*
+ 返回上次加载服务器配置文件的时间（带有时区信息）
+ */
+SELECT PG_CONF_LOAD_TIME();
+
+/*
+ 返回当前使用的日志文件路径
+ (日期的格式 stderr 和 csvlog)
+ */
+SELECT PG_CURRENT_LOGFILE();
+
+/*
+ 检查指定的 OID 是否是另一个会话的临时模式（Schema）的 OID
+ (待检查的 OID)
+ */
+-- 创建临时表
+CREATE TEMPORARY TABLE test
+(
+    id INT
+);
+
+SELECT PG_MY_TEMP_SCHEMA();
+
+DROP TABLE test;
+
+/*
+ 检测 JIT 编译器扩展是否可用
+ （只有在 JIT 编译器扩展可用且 jit 参数配置为 true 时，该函数才返回 true）
+ */
+SELECT PG_JIT_AVAILABLE();
+
+/*
+ 返回当前会话正在侦听的异步通知通道的名称
+ */
+SELECT PG_LISTENING_CHANNELS();
+
+/*
+ 返回当前会话的临时模式（Schema）的 OID
+ */
+SELECT PG_MY_TEMP_SCHEMA();
+
+/*
+ 返回异步通知队列当前未处理的通知所占用的最大大小部分
+ */
+SELECT PG_NOTIFICATION_QUEUE_USAGE();
+
+/*
+ 返回服务器启动的时间
+ */
+SELECT PG_POSTMASTER_START_TIME();
+
+/*
+ 返回触发器的当前嵌套级别
+ */
+SELECT PG_TRIGGER_DEPTH();
+
+/*
+ 返回当前当前会话的用户名
+ */
+SELECT SESSION_USER;
+
+/*
+ 返回当前用户(当前执行上下文的用户)的名称
+ */
+SELECT USER;
+
+/*
+ 返回当前 PostgreSQL 服务器的版本信息
+ */
+SELECT VERSION();
 
 
 
