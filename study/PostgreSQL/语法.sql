@@ -60,8 +60,8 @@ CREATE TABLE IF NOT EXISTS customer -- 表名
 -- 创建是可通过 IF NOT EXISTS 判断表是否已存在
 (
     -- 列名 数据类型 约束
-    first_name VARCHAR(30) NOT NULL ,
-    last_name  VARCHAR(30) NOT NULL ,
+    first_name VARCHAR(30) NOT NULL,
+    last_name  VARCHAR(30) NOT NULL,
     email      VARCHAR(60) NOT NULL
 );
 
@@ -150,19 +150,19 @@ CREATE TABLE grammar_primary_key
 (
     -- PRIMARY KEY 主键约束
     -- 主键列的值必须是唯一的,且不能为 NULL
-    id       INTEGER PRIMARY KEY ,
-    name     VARCHAR(30) ,
-    age      INT NOT NULL ,
+    id       INTEGER PRIMARY KEY,
+    name     VARCHAR(30),
+    age      INT NOT NULL,
     grouping INT NOT NULL
 );
 
 -- 定义主键-多列
 CREATE TABLE grammar_multiseriate_primary_key
 (
-    id   INTEGER ,
-    name VARCHAR(30) ,
+    id   INTEGER,
+    name VARCHAR(30),
     -- 多列主键
-    PRIMARY KEY ( id , name )
+    PRIMARY KEY ( id, name )
 );
 
 /* 外键 */
@@ -170,13 +170,13 @@ CREATE TABLE grammar_multiseriate_primary_key
 -- 创建外键
 CREATE TABLE foreign_key_primary_meter
 (
-    id   INTEGER PRIMARY KEY ,
+    id   INTEGER PRIMARY KEY,
     name VARCHAR(30)
 ); -- 主表
 CREATE TABLE foreign_key
 (
-    id    INTEGER ,
-    email VARCHAR(30) ,
+    id    INTEGER,
+    email VARCHAR(30),
     -- 外键约束名
     CONSTRAINT foreign_key_primary_meter_id
         -- 指定外键列
@@ -204,7 +204,7 @@ ALTER TABLE foreign_key
 -- NULL 不是空串，也不是 0，它表示什么都没有
 CREATE TABLE grammar_null
 (
-    id   INTEGER PRIMARY KEY ,
+    id   INTEGER PRIMARY KEY,
     name VARCHAR(30) NOT NULL -- 非空约束
 );
 
@@ -213,29 +213,29 @@ CREATE TABLE grammar_null
 -- 唯一约束列可以包含 NULL 值
 CREATE TABLE grammar_unique
 (
-    id   INTEGER PRIMARY KEY ,
+    id   INTEGER PRIMARY KEY,
     name VARCHAR(30) UNIQUE -- 唯一约束
 );
 
 -- 多列唯一约束
 CREATE TABLE grammar_multiseriate_unique
 (
-    id    INTEGER PRIMARY KEY ,
-    name  VARCHAR(30) ,
-    email VARCHAR(30) ,
+    id    INTEGER PRIMARY KEY,
+    name  VARCHAR(30),
+    email VARCHAR(30),
     -- 唯一约束名
     CONSTRAINT users_name_email_key
         -- 多列唯一约束
-        UNIQUE ( name , email )
+        UNIQUE ( name, email )
 );
 
 /* 检查约束 */
 -- 检查约束用来定义列的值必须满足指定的条件
 CREATE TABLE grammar_check
 (
-    id   INTEGER PRIMARY KEY ,
-    name VARCHAR(30) ,
-    age  INTEGER ,
+    id   INTEGER PRIMARY KEY,
+    name VARCHAR(30),
+    age  INTEGER,
     -- 检查约束名
     CONSTRAINT users_age_check
         -- 检查条件
@@ -248,9 +248,9 @@ CREATE TABLE grammar_check
 -- 不能直接写入或更新生成列的值
 CREATE TABLE grammar_generated_column
 (
-    id        INTEGER PRIMARY KEY ,
-    name      VARCHAR(30) ,
-    age       INTEGER ,
+    id        INTEGER PRIMARY KEY,
+    name      VARCHAR(30),
+    age       INTEGER,
     -- 生成列
     full_name INTEGER GENERATED ALWAYS AS (age / 2) STORED -- 存储生成列
 );
@@ -260,7 +260,7 @@ CREATE TABLE grammar_generated_column
 CREATE TABLE grammar_identity_column
 (
     -- 标识列
-    id   INTEGER GENERATED ALWAYS AS IDENTITY ,
+    id   INTEGER GENERATED ALWAYS AS IDENTITY,
     name VARCHAR(30)
 );
 
@@ -270,7 +270,7 @@ CREATE TABLE grammar_identity_column
 CREATE TABLE grammar_serial_column
 (
     -- 自增列
-    id   SERIAL ,
+    id   SERIAL,
     name VARCHAR(30)
 );
 
@@ -303,7 +303,7 @@ DROP SEQUENCE IF EXISTS sequence_name;
 -- 临时表只在当前会话中存在
 CREATE TEMPORARY TABLE grammar_temporary
 (
-    id   INTEGER PRIMARY KEY ,
+    id   INTEGER PRIMARY KEY,
     name VARCHAR(30)
 );
 
@@ -326,9 +326,9 @@ BEGIN;
 INSERT
 INTO
     grammar_null
-    (id , name)
+    (id, name)
 VALUES
-    (1 , '张三');
+    (1, '张三');
 
 -- 提交事务
 COMMIT;
@@ -342,7 +342,7 @@ CREATE SCHEMA IF NOT EXISTS test;
 -- 在架构中创建表
 CREATE TABLE IF NOT EXISTS test.users
 (
-    id   INTEGER PRIMARY KEY ,
+    id   INTEGER PRIMARY KEY,
     name VARCHAR(30)
 );
 
@@ -364,15 +364,15 @@ TRUNCATE TABLE grammar_null CASCADE;
 /* 表实例 */
 CREATE TABLE IF NOT EXISTS users
 (
-    id   INTEGER PRIMARY KEY ,
-    name VARCHAR(30) ,
+    id   INTEGER PRIMARY KEY,
+    name VARCHAR(30),
     age  INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS orders
 (
-    id    INTEGER PRIMARY KEY ,
-    email VARCHAR(30) ,
+    id    INTEGER PRIMARY KEY,
+    email VARCHAR(30),
     CONSTRAINT orders_users_id_foreign_key
         FOREIGN KEY ( id )
             REFERENCES users ( id )
@@ -386,27 +386,27 @@ INSERT
 INTO
     -- 表名（列名）列名可以顺序可交换
     users
-    (id , name , age)
+    (id, name, age)
 VALUES
     -- 值
-    (1 , '张三' , 18);
+    (1, '张三', 18);
 
 -- 插入多行数据
 INSERT
 INTO
     users
-    (id , name , age)
+    (id, name, age)
 VALUES
-    (2 , '李四' , 20),
-    (3 , '王五' , 22);
+    (2, '李四', 20),
+    (3, '王五', 22);
 
 -- 返回插入的行信息
 INSERT
 INTO
     users
-    (id , name , age)
+    (id, name, age)
 VALUES
-    (4 , '赵六' , 24)
+    (4, '赵六', 24)
 -- RETURNING 返回插入的行信息
 -- 可以指定返回的列和别名
 RETURNING id;
@@ -415,9 +415,9 @@ RETURNING id;
 INSERT
 INTO
     users
-    (id , name , age)
+    (id, name, age)
 VALUES
-    (4 , '李七' , 18)
+    (4, '李七', 18)
 ON CONFLICT (id) -- 指定冲突处理
 -- DO NOTHING —— 什么都不做
 -- DO UPDATE SET —— 更新数据
@@ -449,15 +449,15 @@ RETURNING *;
 -- 数据
 INSERT
 INTO
-    orders(id , email)
+    orders(id, email)
 VALUES
-    (1 , '11443546565@qq.com'),
-    (2 , '21212321456@qq.com');
+    (1, '11443546565@qq.com'),
+    (2, '21212321456@qq.com');
 -- 表达式替换
 UPDATE orders
 SET
     -- 替换全部域名
-    email = REPLACE(email,'qq','163')
+    email = REPLACE(email, 'qq', '163')
 RETURNING *;
 
 -- CASE 表达式
@@ -498,14 +498,14 @@ WHERE
 /* 表实例 */
 CREATE TABLE employee
 (
-    id   INTEGER ,
-    name TEXT ,
+    id   INTEGER,
+    name TEXT,
     age  INTEGER
 );
 CREATE TABLE detailed_information
 (
-    id           INTEGER ,
-    emil         TEXT ,
+    id           INTEGER,
+    emil         TEXT,
     home_address TEXT
 );
 
@@ -514,22 +514,22 @@ DROP TABLE employee;
 /* 数据 */
 INSERT
 INTO
-    employee(id , name , age)
+    employee(id, name, age)
 VALUES
-    (1 , '小白' , 21),
-    (2 , '小红' , 51),
-    (3 , '小黑' , 35),
-    (4 , '小粉' , 19),
-    (5 , '小白' , 26);
+    (1, '小白', 21),
+    (2, '小红', 51),
+    (3, '小黑', 35),
+    (4, '小粉', 19),
+    (5, '小白', 26);
 INSERT
 INTO
-    detailed_information(id , emil , home_address)
+    detailed_information(id, emil, home_address)
 VALUES
-    (1 , '12412151231@qq.com' , '北京市'),
-    (2 , '51312513213@qq.com' , '南京市'),
-    (3 , '56121315624@qq.com' , '青岛市'),
-    (4 , '32141324512@qq.com' , '宁波市'),
-    (5 , '12543624467@qq.com' , '西安市');
+    (1, '12412151231@qq.com', '北京市'),
+    (2, '51312513213@qq.com', '南京市'),
+    (3, '56121315624@qq.com', '青岛市'),
+    (4, '32141324512@qq.com', '宁波市'),
+    (5, '12543624467@qq.com', '西安市');
 
 -- 单表查询
 -- 查询所有列
@@ -681,7 +681,7 @@ FROM
     employee
 WHERE
     -- 匹配查询
-    name IN ( '小黑' , '小绿' );
+    name IN ( '小黑', '小绿' );
 
 /* 子查询 */
 -- 一般用在 IN 和 EXISTS 中
@@ -853,18 +853,18 @@ ORDER BY
 CREATE TABLE student
 (
     -- 学生ID
-    student_id INTEGER     NOT NULL ,
+    student_id INTEGER     NOT NULL,
     -- 姓名
-    name       VARCHAR(45) NOT NULL ,
+    name       VARCHAR(45) NOT NULL,
     PRIMARY KEY ( student_id )
 );
 
 CREATE TABLE student_score
 (
     -- 学生ID
-    student_id INTEGER     NOT NULL ,
+    student_id INTEGER     NOT NULL,
     -- 科目
-    subject    VARCHAR(45) NOT NULL ,
+    subject    VARCHAR(45) NOT NULL,
     -- 得分
     score      INTEGER     NOT NULL
 );
@@ -872,21 +872,21 @@ CREATE TABLE student_score
 INSERT
 INTO
     student
-    (student_id , name)
+    (student_id, name)
 VALUES
-    (1 , 'Tim'),
-    (2 , 'Jim'),
-    (3 , 'Lucy');
+    (1, 'Tim'),
+    (2, 'Jim'),
+    (3, 'Lucy');
 
 INSERT
 INTO
     student_score
-    (student_id , subject , score)
+    (student_id, subject, score)
 VALUES
-    (1 , 'English' , 90),
-    (1 , 'Math' , 80),
-    (2 , 'English' , 85),
-    (5 , 'English' , 92);
+    (1, 'English', 90),
+    (1, 'Math', 80),
+    (2, 'English', 85),
+    (5, 'English', 92);
 
 -- CROSS 交叉连接
 -- 返回两个集合的笛卡尔积
@@ -964,18 +964,18 @@ FROM
 /* INTERSECT 交集查询 */
 -- 返回两个集合的交集
 SELECT
-    GENERATE_SERIES(1,10)
+    GENERATE_SERIES(1, 10)
 INTERSECT
 SELECT
-    GENERATE_SERIES(5,15);
+    GENERATE_SERIES(5, 15);
 
 /* EXCEPT 差集查询 */
 -- 返回两个集合的差集
 SELECT
-    GENERATE_SERIES(1,10)
+    GENERATE_SERIES(1, 10)
 EXCEPT
 SELECT
-    GENERATE_SERIES(5,15);
+    GENERATE_SERIES(5, 15);
 
 /* 通用表达式与递归查询 */
 -- 语言级别的临时表
@@ -1005,9 +1005,9 @@ FROM
 -- 递归查询操作表
 CREATE TABLE category
 (
-    id        SERIAL PRIMARY KEY ,
-    name      VARCHAR NOT NULL ,
-    parent_id INT ,
+    id        SERIAL PRIMARY KEY,
+    name      VARCHAR NOT NULL,
+    parent_id INT,
     CONSTRAINT fk_category
         FOREIGN KEY ( parent_id ) REFERENCES category ( id )
 );
@@ -1015,25 +1015,25 @@ CREATE TABLE category
 INSERT
 INTO
     category
-    (id , name , parent_id)
+    (id, name, parent_id)
 VALUES
-    (1 , 'ROOT' , NULL),
-    (2 , 'Baby' , 1),
-    (3 , 'Home And Kitchen' , 1),
-    (4 , 'Baby Care' , 2),
-    (5 , 'Feeding' , 2),
-    (6 , 'Gifts' , 2),
-    (7 , 'Safety' , 2),
-    (8 , 'Bedding' , 3),
-    (9 , 'Bath' , 3),
-    (10 , 'Furniture' , 3),
-    (11 , 'Grooming' , 4),
-    (12 , 'Hair Care' , 4),
-    (13 , 'Baby Foods' , 5),
-    (14 , 'Food Mills' , 5),
-    (15 , 'Solid Feeding' , 5),
-    (16 , 'Bed Pillows' , 8),
-    (17 , 'Bed Skirts' , 8);
+    (1, 'ROOT', NULL),
+    (2, 'Baby', 1),
+    (3, 'Home And Kitchen', 1),
+    (4, 'Baby Care', 2),
+    (5, 'Feeding', 2),
+    (6, 'Gifts', 2),
+    (7, 'Safety', 2),
+    (8, 'Bedding', 3),
+    (9, 'Bath', 3),
+    (10, 'Furniture', 3),
+    (11, 'Grooming', 4),
+    (12, 'Hair Care', 4),
+    (13, 'Baby Foods', 5),
+    (14, 'Food Mills', 5),
+    (15, 'Solid Feeding', 5),
+    (16, 'Bed Pillows', 8),
+    (17, 'Bed Skirts', 8);
 
 WITH
     RECURSIVE
@@ -1092,8 +1092,8 @@ DROP VIEW employee_string;
 -- 创建表
 CREATE TABLE capital
 (
-    name       TEXT ,
-    population REAL ,
+    name       TEXT,
+    population REAL,
     elevation  INT
 );
 
@@ -1111,7 +1111,7 @@ INSERT
 INTO
     capital
 VALUES
-    ('武汉' , 1000 , 100);
+    ('武汉', 1000, 100);
 
 SELECT *
 FROM
@@ -1327,7 +1327,7 @@ FROM
 -- 索引参数表
 CREATE TABLE grammar_index
 (
-    id   INTEGER ,
+    id   INTEGER,
     name TEXT
 );
 
@@ -1339,7 +1339,7 @@ SELECT
     v,
     'val:' || v
 FROM
-    GENERATE_SERIES(1,10000000) v;
+    GENERATE_SERIES(1, 10000000) v;
 
 -- 无索引查询
 EXPLAIN ANALYZE
@@ -1368,7 +1368,7 @@ CREATE INDEX test_id_index
 
 /* 多列索引 */
 CREATE INDEX test_id_name_index
-    ON grammar_index USING BTREE ( id , name );
+    ON grammar_index USING BTREE ( id, name );
 
 EXPLAIN ANALYZE
 SELECT *
@@ -1406,4 +1406,54 @@ FROM
     grammar_index
 WHERE
     UPPER(name) = 'VAL:1000000';
+
+/* 表分区 */
+-- 将大型表拆分成更小的、更易管理的片段
+-- 插入数据时,数据库会根据分区键的值自动将数据路由到适当的分区
+-- 查询分区表与查询常规表类似,但在查询中不需要指定特定分区
+
+/* 范围分区 */
+-- 适用于具有有序范围的数据,如日期、数值范围等
+-- 常用于按时间、价格范围等划分数据
+-- 创建范围分区表
+CREATE TABLE sales
+(
+    id        SERIAL PRIMARY KEY,
+    sale_date DATE,
+    amount    NUMERIC
+    -- 指定范围分区
+) PARTITION BY RANGE (sale_date);
+-- 创建范围分区
+CREATE TABLE sales_january PARTITION OF sales
+    FOR VALUES FROM ('2023-01-01') TO ('2023-02-01');
+
+/* 列表分区 */
+-- 适用于根据预定义值列表对数据进行划分,如地区、类别等
+-- 创建列表分区表
+CREATE TABLE employees
+(
+    id         SERIAL PRIMARY KEY,
+    department TEXT,
+    salary     NUMERIC
+    -- 指定列表分区
+) PARTITION BY LIST (department);
+-- 创建列表分区
+CREATE TABLE employees_engineering PARTITION OF employees
+    FOR VALUES IN ('Engineering');
+
+/* 哈希分区 */
+-- 适用于需要在多个分区之间均匀分布数据的情况
+-- 常用于避免单一分区的数据过载
+-- 创建哈希分区表
+CREATE TABLE orders
+(
+    id          SERIAL PRIMARY KEY,
+    customer_id INT,
+    order_date  DATE
+    -- 指定哈希分区
+) PARTITION BY HASH (customer_id);
+-- 创建哈希分区
+CREATE TABLE orders_part PARTITION OF orders
+    --  (MODULUS 哈希函数的模数（划分的分区数）, REMAINDER 哈希函数的余数（标识分区的编号）)
+    FOR VALUES WITH (MODULUS 4, REMAINDER 0);
 
