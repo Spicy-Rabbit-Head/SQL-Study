@@ -1457,3 +1457,36 @@ CREATE TABLE orders_part PARTITION OF orders
     --  (MODULUS 哈希函数的模数（划分的分区数）, REMAINDER 哈希函数的余数（标识分区的编号）)
     FOR VALUES WITH (MODULUS 4, REMAINDER 0);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
