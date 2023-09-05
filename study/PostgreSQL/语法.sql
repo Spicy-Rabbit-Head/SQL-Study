@@ -1457,18 +1457,43 @@ CREATE TABLE orders_part PARTITION OF orders
     --  (MODULUS 哈希函数的模数（划分的分区数）, REMAINDER 哈希函数的余数（标识分区的编号）)
     FOR VALUES WITH (MODULUS 4, REMAINDER 0);
 
+/* SIMILAR TO 模式匹配 */
+-- 可使用正则
+SELECT 'hello' SIMILAR TO 'h%';
 
+/* POSIX 正则 */
+SELECT 'hello' ~ 'h.*';
 
+/* 条件表达式 */
+-- CASE 表达式
+SELECT
+    i,
+    CASE
+        WHEN i % 2 = 1 THEN 'true'
+        ELSE 'false'
+        END
+FROM
+    GENERATE_SERIES(1, 10) i;
 
+-- COALESCE 表达式
+-- 返回第一个不为 NULL 的值
+SELECT
+    COALESCE(NULL, 1, 2, 3);
 
+-- NULLIF 表达式
+-- 如果两个值相等,返回 NULL,否则返回第一个值
+SELECT
+    NULLIF(2, 4);
 
+-- GREATEST 表达式
+-- 返回最大值
+SELECT
+    GREATEST(1, 2, 3);
 
-
-
-
-
-
-
+-- LEAST 表达式
+-- 返回最小值
+SELECT
+    LEAST(1, 2, 3);
 
 
 

@@ -2803,4 +2803,205 @@ FROM
     student_information;
 
 
+/* 二进制字符串函数及位进制字符串函数 */
+
+/*
+ 从二进制字符串中提取指定的位并返回
+ */
+SELECT GET_BIT('10101010'::BYTEA, 2);
+
+/*
+ 从二进制字符串中提取指定的字节
+ */
+SELECT GET_BYTE('10101010'::BYTEA, 2);
+
+/*
+ 将二进制字符串中的指定为更新
+ */
+SELECT SET_BIT('10101010'::BYTEA, 2, 1);
+
+/*
+ 将二进制字符串中的指定字节更新
+ */
+SELECT SET_BYTE('10101010'::BYTEA, 2, 1);
+
+/*
+ 计算二进制字符串的 SHA-224 哈希
+ */
+SELECT SHA224('abc'::BYTEA);
+
+/*
+ 计算二进制字符串的 SHA-256 哈希
+ */
+SELECT SHA256('abc'::BYTEA);
+
+/*
+ 计算二进制字符串的 SHA-384 哈希
+ */
+SELECT SHA384('abc'::BYTEA);
+
+/*
+ 计算二进制字符串的 SHA-512 哈希
+ */
+SELECT SHA512('abc'::BYTEA);
+
+
+/* 网络地址函数 */
+
+/*
+ 创建文本形式的缩写显示格式
+ */
+SELECT ABBREV('10.1.0.0/16'::INET);
+-- CIDR 缩写
+SELECT ABBREV('10.1.0.0/16'::CIDR);
+
+/*
+ 计算地址网络的广播地址
+ */
+SELECT BROADCAST('192.168.1.5/24'::INET);
+
+/*
+ 返回地址的族
+ */
+SELECT FAMILY('::1'::INET);
+
+
+/*
+ 以文本形式返回 IP 地址,忽略网络掩码
+ */
+SELECT HOST('192.168.1.5/24'::INET);
+
+/*
+ 计算地址网络的主机掩码
+ */
+SELECT HOSTMASK('192.168.1.5/24'::INET);
+
+/*
+ 计算包含两个给定网络的最小网络
+ */
+SELECT INET_MERGE('198.168.1.5/24'::INET, '192.168.2.5/24'::INET);
+
+/*
+ 测试地址是否属于同一 IP 系列
+ */
+SELECT INET_SAME_FAMILY('192.168.1.5/24'::INET, '::1'::INET);
+
+/*
+ 返回网络掩码长度（以位为单位）
+ */
+SELECT MASKLEN('192.168.1.5/24'::INET);
+
+/*
+ 计算地址网络的网络掩码
+ */
+SELECT NETMASK('192.168.1.5/24'::INET);
+
+/*
+ 返回地址的网络部分,将网络掩码右侧的任何内容清零
+ */
+SELECT NETWORK('192.168.1.5/24'::INET);
+
+/*
+ 设置值的网络掩码长度
+ 地址部分不会更改
+ */
+SELECT SET_MASKLEN('192.168.1.5/24'::INET, 16);
+SELECT SET_MASKLEN('192.168.1.0/24'::CIDR, 16);
+
+/*
+ 以文本形式返回未缩写的 IP 地址和网络掩码长度
+ */
+SELECT TEXT('192.168.1.5'::INET);
+
+/*
+ MAC 地址
+ 将地址的最后 3 个字节设置为零
+ */
+SELECT TRUNC('12:23:23:23:23:23'::MACADDR);
+
+
+/* 文本搜索函数 */
+
+/*
+ 将文本字符串数组转换为原样用作词素
+ */
+SELECT ARRAY_TO_TSVECTOR('{a,b,c}'::TEXT[]);
+
+/*
+ 返回当前默认文本搜索配置的 OID
+ */
+SELECT GET_CURRENT_TS_CONFIG();
+
+/*
+ 返回词素加运算符数
+ */
+SELECT NUMNODE('(fat & rat) | cat'::TSQUERY);
+
+/*
+ 将文本转换为根据指定或默认配置规范化单词
+ */
+SELECT PLAINTO_TSQUERY('english', 'The Fat Rats');
+
+/*
+ 将文本转换为根据指定或默认配置规范化单词
+ */
+SELECT WEBSEARCH_TO_TSQUERY('english', '"fat rat" or cat dog');
+
+/*
+ 生成的可索引部分的表示形式
+ 结果为空或仅指示不可索引的查询
+ */
+SELECT QUERYTREE('fat & ! rat'::TSQUERY);
+
+/*
+ 为矢量的每个元素分配指定的权重
+ */
+SELECT SETWEIGHT('fat:2,4 cat:3 rat:5B'::TSVECTOR, 'A');
+
+/*
+ 删除位置和权重
+ */
+SELECT STRIP('fat:2,4 cat:3 rat:5B'::TSVECTOR);
+
+/*
+ 将文本转换为根据指定或默认配置规范化单词
+ */
+SELECT TO_TSVECTOR('english', 'The Fat Rats');
+-- 将json转换为根据指定或默认配置规范化单词
+SELECT
+    TO_TSVECTOR('english', '{
+      "aa": "The Fat Rats",
+      "b": "dog"
+    }'::JSON);
+
+/*
+ 选择 JSON 文档中筛选器请求的每个项目,并将每个项目转换根据指定的或默认配置规范化单词
+ */
+SELECT
+    TO_TSVECTOR('english', '{
+      "aa": "The Fat Rats",
+      "b": "dog"
+    }'::JSON);
+
+/*
+ 从向量中删除给定词素的任何匹配项
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
