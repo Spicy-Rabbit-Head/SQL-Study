@@ -2978,10 +2978,10 @@ SELECT
  选择 JSON 文档中筛选器请求的每个项目,并将每个项目转换根据指定的或默认配置规范化单词
  */
 SELECT
-    TO_TSVECTOR('english', '{
-      "aa": "The Fat Rats",
-      "b": "dog"
-    }'::JSON);
+    JSON_TO_TSVECTOR('english', '{
+      "a": "The Fat Rats",
+      "b": 123
+    }'::JSON, '["string", "numeric"]');
 
 /*
  从向量中删除给定词素的任何匹配项
@@ -3025,13 +3025,6 @@ SELECT TSQUERY_PHRASE(TO_TSQUERY('fat'), TO_TSQUERY('cat'));
  */
 SELECT TSVECTOR_TO_ARRAY('fat:2,4 cat:3 rat:5A'::TSVECTOR);
 
-/*
- 将 扩展为一组行,每个词法一个行
- */
-SELECT *
-FROM
-    UNNEST('cat:3 fat:2,4 rat:5A'::TSVECTOR);
-
 /* 文本搜索调试函数 */
 
 /*
@@ -3063,17 +3056,151 @@ SELECT TS_TOKEN_TYPE(3722);
  执行 sqlquery（必须返回单个列）,
  并返回有关数据中包含的每个不同词法的统计信息
  */
-SELECT TS_STAT(''
+-- 创建测试表
+CREATE TABLE test_sqlquery
+(
+    id   INTEGER,
+    info TSVECTOR
+);
+-- 插入测试数据
+INSERT
+INTO
+    test_sqlquery
+    (id, info)
+VALUES
+    (1, TO_TSVECTOR('The Fat Rats')),
+    (2, TO_TSVECTOR('The Fat Rats')),
+    (3, TO_TSVECTOR('The Fat Rats')),
+    (4, TO_TSVECTOR('The Fat Rats')),
+    (5, TO_TSVECTOR('The Fat Rats'));
+-- 执行sqlquery
+SELECT TS_STAT('SELECT info FROM test_sqlquery');
 
 
+/* XML 函数 */
+
+/*
+ 将字符串转换为 XML 值
+ */
+SELECT XMLPARSE(DOCUMENT '<?xml version="1.1"?><content>abc</content>');
 
 
+/*
+ 创建一个 XML 值,其中包含以指定文本作为内容的 XML 注释
+ */
+SELECT XMLCOMMENT('This is a comment');
 
+/*
+ 连接单个 XML 值的列表,以创建包含 XML 内容片段的单个值
+ */
+SELECT
+    XMLCONCAT('
+              <abc/>', '
+              <bar>foo</bar>');
 
+/*
+ 生成具有给定名称、属性和内容的 XML 元素
+ */
+SELECT XMLELEMENT(NAME "foo", XMLATTRIBUTES('bar' AS "baz"), 'abc');
 
+/*
+ 使用给定的名称和内容生成元素的 XML 林（序列）
+ */
+SELECT XMLFOREST('abc' AS foo, 123 AS bar);
 
+/*
+ 创建一个 XML 处理指令
+ */
+SELECT XMLPI(NAME "php", 'echo "Hello World"');
 
+/*
+ 更改 XML 值的根节点的属性
+ */
+SELECT
+    XMLROOT(XMLPARSE(DOCUMENT '<?xml version="1.1"?><content>abc</content>'),
+            VERSION '1.0', STANDALONE YES);
 
+/*
+ 检查字符串是否表示格式正确的 XML,并返回布尔结果
+ */
+SELECT XML_IS_WELL_FORMED('<?xml version="1.1"?><content>abc</content>');
 
+/*
+ 检查字符串是否表示格式正确的 XML 文档,并返回布尔结果
+ */
+SELECT XML_IS_WELL_FORMED_DOCUMENT('<?xml version="1.1"?><content>abc</content>');
 
+/*
+ 检查字符串是否表示格式正确的 XML 内容片段,并返回布尔结果
+ */
+SELECT XML_IS_WELL_FORMED_CONTENT('<?xml version="1.1"?><content>abc</content>');
 
+/*
+ 根据 XML 值 xml 计算 XPath 1.0 表达式 xpath（以文本形式给出）
+ */
+SELECT
+    XPATH('/my:a/text()', '
+    <my:a xmlns:my="http://example.com">test</my:a>',
+          ARRAY [ARRAY ['my', 'http://example.com']]);
+
+/*
+ 指示查询是否满足
+ */
+SELECT
+    XPATH_EXISTS('/my:a/text()', '
+    <my:a xmlns:my="http://example.com">test</my:a>',
+                 ARRAY [ARRAY ['my', 'http://example.com']]);
+
+/*
+ 生成基于 XML 值的表、用于提取行的 XPath 筛选器和一组列定义
+ */
+-- 创建测试表
+CREATE TABLE test_xmltable
+AS
+SELECT
+    XML $$
+    <ROWS>
+        <ROW id="1">
+            <COUNTRY_ID>AU</COUNTRY_ID>
+            <COUNTRY_NAME>Australia</COUNTRY_NAME>
+        </ROW>
+        <ROW id="5">
+            <COUNTRY_ID>JP</COUNTRY_ID>
+            <COUNTRY_NAME>Japan</COUNTRY_NAME>
+            <PREMIER_NAME>Shinzo Abe</PREMIER_NAME>
+            <SIZE unit="sq_mi">145935</SIZE>
+        </ROW>
+        <ROW id="6">
+            <COUNTRY_ID>SG</COUNTRY_ID>
+            <COUNTRY_NAME>Singapore</COUNTRY_NAME>
+            <SIZE unit="sq_km">697</SIZE>
+        </ROW>
+    </ROWS>
+    $$ AS data;
+-- 查询
+SELECT *
+FROM
+    test_xmltable,
+    XMLTABLE(
+            '/ROWS/ROW'
+            PASSING data
+            COLUMNS
+                id INT PATH '@id',
+                country_id CHAR(2) PATH 'COUNTRY_ID',
+                country_name VARCHAR(20) PATH 'COUNTRY_NAME',
+                premier_name VARCHAR(20) PATH 'PREMIER_NAME',
+                size INT PATH 'SIZE',
+                size_unit CHAR(5) PATH 'SIZE/@unit'
+        ) AS t;
+
+/*
+ 将表映射到 XML 值
+ (表名,是否包含空值,是否包含 XML 声明,XML 声明的版本号)
+ */
+SELECT TABLE_TO_XML('test_xmltable', TRUE, FALSE, '');
+
+/*
+ 将查询映射到 XML 值
+ (查询,是否包含空值,是否包含 XML 声明,XML 声明的版本号)
+ */
+SELECT QUERY_TO_XML('SELECT * FROM test_xmltable', TRUE, FALSE, '');
