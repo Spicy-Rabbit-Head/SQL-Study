@@ -2986,12 +2986,84 @@ SELECT
 /*
  从向量中删除给定词素的任何匹配项
  */
+SELECT TS_DELETE('fat:2,4 cat:3 rat:5A'::TSVECTOR, 'fat');
 
+/*
+ 从向量中选择具有给定权重的元素
+ */
+SELECT TS_FILTER('fat:2,4 cat:3b,7c rat:5A'::TSVECTOR, '{a,b}');
 
+/*
+ 以缩写形式显示文档中查询的匹配项,该匹配项必须是原始文本
+ 而不是文档中的单词在与查询匹配之前根据指定的或默认配置进行规范化
+ */
+SELECT TS_HEADLINE('The fat cat ate the rat.', 'cat');
 
+/*
+ 计算显示向量与查询匹配程度的分数
+ */
+SELECT TS_RANK('fat:2,4 cat:3 rat:5A'::TSVECTOR, 'cat');
 
+/*
+ 使用覆盖密度算法计算显示矢量与查询匹配程度的分数
+ */
+SELECT TS_RANK_CD('fat:2,4 cat:3 rat:5A'::TSVECTOR, 'cat');
 
+/*
+ 将查询中出现的目标替换为替换
+ */
+SELECT TS_REWRITE('a & b'::TSQUERY, 'a'::TSQUERY, 'foo|bar'::TSQUERY);
 
+/*
+ 构造一个短语查询
+ 该查询在连续的词素（与运算符相同）中搜索查询 1 和查询 2 的匹配项
+ */
+SELECT TSQUERY_PHRASE(TO_TSQUERY('fat'), TO_TSQUERY('cat'));
+
+/*
+ 转换为词素数组
+ */
+SELECT TSVECTOR_TO_ARRAY('fat:2,4 cat:3 rat:5A'::TSVECTOR);
+
+/*
+ 将 扩展为一组行,每个词法一个行
+ */
+SELECT *
+FROM
+    UNNEST('cat:3 fat:2,4 rat:5A'::TSVECTOR);
+
+/* 文本搜索调试函数 */
+
+/*
+ 根据指定的或默认的文本搜索配置从文档中提取和规范化令牌,
+ 并返回有关如何处理每个标记的信息
+ */
+SELECT TS_DEBUG('english', 'The Brightest supernovaes');
+
+/*
+ 如果字典知道输入标记,则返回替换词素数组
+ 如果字典知道该标记但它是一个停用词,则返回一个空数组
+ 如果它不是已知单词,则返回 NULL
+ */
+SELECT TS_LEXIZE('english_stem', 'stars');
+
+/*
+ 使用命名分析器从文档中提取令牌
+ */
+SELECT TS_PARSE('default', 'foo - bar');
+
+/*
+ 返回一个表,该表描述命名分析程序可以识别的每种类型的标记
+ */
+SELECT TS_TOKEN_TYPE('default');
+-- 指定 OID
+SELECT TS_TOKEN_TYPE(3722);
+
+/*
+ 执行 sqlquery（必须返回单个列）,
+ 并返回有关数据中包含的每个不同词法的统计信息
+ */
+SELECT TS_STAT(''
 
 
 
