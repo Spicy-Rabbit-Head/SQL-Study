@@ -3104,7 +3104,7 @@ SELECT
 SELECT XMLELEMENT(NAME "foo", XMLATTRIBUTES('bar' AS "baz"), 'abc');
 
 /*
- 使用给定的名称和内容生成元素的 XML 林（序列）
+ 使用给定的名称和内容生成元素的 XML（序列）
  */
 SELECT XMLFOREST('abc' AS foo, 123 AS bar);
 
@@ -3204,3 +3204,160 @@ SELECT TABLE_TO_XML('test_xmltable', TRUE, FALSE, '');
  (查询,是否包含空值,是否包含 XML 声明,XML 声明的版本号)
  */
 SELECT QUERY_TO_XML('SELECT * FROM test_xmltable', TRUE, FALSE, '');
+
+/*
+ 将游标映射到 XML 值
+ (游标名,是否包含空值,是否包含 XML 声明,XML 声明的版本号)
+ */
+-- TODO 待完善
+
+
+/* 访问权限控制函数 */
+
+/*
+ 用户是否对表的任何列具有权限
+ (表名,权限)
+ (用户名,表名,权限)
+ */
+SELECT HAS_ANY_COLUMN_PRIVILEGE('users', 'SELECT');
+SELECT HAS_ANY_COLUMN_PRIVILEGE('postgres', 'users', 'SELECT');
+
+/*
+ 用户是否具有指定表列的权限
+ (表名,列名,权限)
+ (用户名,表名,列名,权限)
+ */
+SELECT HAS_COLUMN_PRIVILEGE('users', 'id', 'SELECT');
+SELECT HAS_COLUMN_PRIVILEGE('postgres', 'users', 'id', 'SELECT');
+
+/*
+ 用户是否具有指定数据库的权限
+ (用户名,数据库名,权限)
+ */
+SELECT HAS_DATABASE_PRIVILEGE('postgres', 'study', 'CONNECT');
+
+/*
+ 用户是否具有外部数据包装器的权限
+ 唯一允许的权限类型是 : USAGE
+ (外部数据包装器名,权限)
+ (用户名,外部数据包装器名,权限)
+ */
+SELECT HAS_FOREIGN_DATA_WRAPPER_PRIVILEGE('postgres', 'file_fdw', 'USAGE');
+
+/*
+ 用户是否具有功能权限
+ 唯一允许的权限类型是 : EXECUTE
+ (用户名,函数名,权限)
+ */
+SELECT HAS_FUNCTION_PRIVILEGE('postgres', 'chr(int)', 'EXECUTE');
+
+/*
+ 用户是否具有语言权限
+ 唯一允许的权限类型是 : USAGE
+ (用户名,语言名,权限)
+ */
+SELECT HAS_LANGUAGE_PRIVILEGE('postgres', 'plpgsql', 'USAGE');
+
+/*
+ 用户是否具有配置参数的权限
+ 允许的权限类型为 : SETALTER SYSTEM
+ (用户名,配置参数名,权限)
+ */
+SELECT HAS_PARAMETER_PRIVILEGE('postgres', 'log_connections', 'SET');
+
+/*
+ 用户是否具有架构权限
+ (用户名,架构名,权限)
+ */
+SELECT HAS_SCHEMA_PRIVILEGE('postgres', 'public', 'CREATE');
+
+/*
+ 用户是否具有序列权限
+ (用户名,序列名,权限)
+ */
+-- 创建序列
+CREATE SEQUENCE users_id_seq;
+SELECT HAS_SEQUENCE_PRIVILEGE('postgres', 'users_id_seq', 'SELECT');
+-- 删除序列
+DROP SEQUENCE users_id_seq;
+
+/*
+ 用户是否具有外部服务器的权限
+ 唯一允许的权限类型是 : USAGE
+ (用户名,外部服务器名,权限)
+ */
+SELECT HAS_SERVER_PRIVILEGE('postgres', 'localhost', 'USAGE');
+
+/*
+ 用户是否具有表的权限
+ (用户名,表名,权限)
+ */
+SELECT HAS_TABLE_PRIVILEGE('postgres', 'users', 'SELECT');
+
+/*
+ 用户是否具有表空间的权限
+ (用户名,表空间名,权限)
+ */
+SELECT HAS_TABLESPACE_PRIVILEGE('postgres', 'pg_default', 'CREATE');
+
+/*
+ 用户是否具有类型的权限
+ (用户名,类型名,权限)
+ */
+SELECT HAS_TYPE_PRIVILEGE('postgres', 'int4', 'USAGE');
+
+/*
+ 用户是否具有角色权限
+ (用户名,角色名,权限)
+ */
+SELECT PG_HAS_ROLE('postgres', 'USAGE');
+
+/*
+ 在当前用户和当前环境的上下文中,
+ 指定表的行级别安全性是否处于活动状态
+ */
+SELECT ROW_SECURITY_ACTIVE('users');
+
+/*
+ 构造一个数组,该数组对属于具有 OID 所有者 ID 的角色的类型类型的对象具有默认访问权限
+ (类型,所有者 ID)
+ */
+SELECT ACLDEFAULT('r', 10);
+
+/*
+ 以一组行的形式返回数组,
+ (ACL 数组)
+ 如果被授权者是伪角色 PUBLIC,则在被授权者列中用零表示
+ */
+-- TODO 待完善
+
+/*
+ 使用给定属性构造
+ (被授权者,对象类型,对象 ID,列名,权限)
+ */
+-- TODO 待完善
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
