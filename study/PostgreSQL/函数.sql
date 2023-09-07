@@ -2330,8 +2330,8 @@ FROM
     tax_revenue;
 
 /*
- 返回当前行所在的分区内的排名，从 1 开始,但有间隔
- 相同的值具有相同的排名，但是下一个不同的值的排名采用下一个整数
+ 返回当前行所在的分区内的排名,从 1 开始,但有间隔
+ 相同的值具有相同的排名,但是下一个不同的值的排名采用下一个整数
  (参与分区的列的列表,参与排序的列的列表)
  */
 SELECT *,
@@ -2462,7 +2462,7 @@ DROP TABLE test;
 
 /*
  检测 JIT 编译器扩展是否可用
- （只有在 JIT 编译器扩展可用且 jit 参数配置为 true 时，该函数才返回 true）
+ （只有在 JIT 编译器扩展可用且 jit 参数配置为 true 时,该函数才返回 true）
  */
 SELECT PG_JIT_AVAILABLE();
 
@@ -3337,18 +3337,360 @@ SELECT ACLDEFAULT('r', 10);
  */
 -- TODO 待完善
 
+/* 架构可见性函数 */
+-- 参数为 OID 或者名称
+
+/*
+ 排序规则在搜索路径中是否可见
+ */
+SELECT PG_COLLATION_IS_VISIBLE(1);
+
+/*
+ 转换在搜索路径中是否可见
+ */
+SELECT PG_CONVERSION_IS_VISIBLE(1);
+
+/*
+ 函数在搜索路径中是否可见
+ */
+SELECT PG_FUNCTION_IS_VISIBLE(1);
+
+/*
+ 运算符类在搜索路径中可见吗
+ */
+SELECT PG_OPCLASS_IS_VISIBLE(1);
+
+/*
+ 运算符在搜索路径中是否可见
+ */
+SELECT PG_OPERATOR_IS_VISIBLE(1);
+
+/*
+ 运算符系列在搜索路径中是否可见
+ */
+SELECT PG_OPFAMILY_IS_VISIBLE(1);
+
+/*
+ 统计信息对象在搜索路径中是否可见
+ */
+SELECT PG_STATISTICS_OBJ_IS_VISIBLE(1);
+
+/*
+ 表在搜索路径中可见吗
+ */
+SELECT PG_TABLE_IS_VISIBLE(1);
+
+/*
+ 文本搜索配置在搜索路径中是否可见
+ */
+SELECT PG_TS_CONFIG_IS_VISIBLE(1);
+
+/*
+ 文本搜索词典在搜索路径中可见
+ */
+SELECT PG_TS_DICT_IS_VISIBLE(1);
+
+/*
+ 文本搜索分析器在搜索路径中是否可见
+ */
+SELECT PG_TS_PARSER_IS_VISIBLE(1);
+
+/*
+ 文本搜索模板在搜索路径中是否可见
+ */
+SELECT PG_TS_TEMPLATE_IS_VISIBLE(1);
+
+/*
+ 类型（或域）在搜索路径中是否可见
+ */
+SELECT PG_TYPE_IS_VISIBLE(1);
 
 
+/* 系统目录信息函数 */
+
+/*
+ 返回数据类型的 SQL 名称,该数据类型由其类型 OID 和可能的类型修饰符标识
+ 如果不知道特定修饰符,则为类型修饰符传递 NUL
+ */
+SELECT FORMAT_TYPE(23, NULL);
+
+/*
+ 将提供的编码名称转换为表示某些系统目录表中使用的内部标识符的整数,
+ 如果提供了未知的编码名称,则返回 -1
+ */
+SELECT PG_CHAR_TO_ENCODING('UTF8');
+
+/*
+ 将某些系统目录表中用作编码的内部标识符的整数转换为人类可读的字符串
+ 如果提供的编码编号无效,则返回空字符串
+ */
+SELECT PG_ENCODING_TO_CHAR(6);
+
+/*
+ 返回一组描述 PostgreSQL 系统目录中存在的外键关系的记录
+ fktable 列包含引用目录的名称,
+ fkcols 列包含引用列的名称,
+ pktable 列包含引用目录的名称,
+ pkcols 列包含引用列的名称,
+ is_array 为 true,则最后一个引用列是一个数组,其每个元素都应与引用目录中的某个条目匹配,
+ is_opt 为 true,则允许引用列包含零而不是有效引用
+ */
+SELECT PG_GET_CATALOG_FOREIGN_KEYS();
+
+/*
+ 重新构造约束的创建命令
+ 这是反编译的重建,而不是命令的原始文本
+ (约束 OID)
+ */
+SELECT PG_GET_CONSTRAINTDEF(1);
+
+/*
+ 反编译存储在系统目录中的表达式的内部形式,如列的默认值
+ 如果表达式可能包含 Var,请指定它们引用的关系的 OID 作为第二个参数
+ 如果预期没有 Var,则传递零就足够了
+ (表达式,关系 OID,是否使用别名)
+ */
+SELECT
+    PG_GET_EXPR(adbin, adrelid, TRUE)
+FROM
+    pg_attrdef;
+
+/*
+ 重新构造函数或过程的创建命令
+ 这是反编译的重建,而不是命令的原始文本
+ 结果是一个完整的 or 语句
+ */
+SELECT PG_GET_FUNCTIONDEF(1);
+
+/*
+ 以函数或过程需要显示的形式（包括默认值）重建函数或过程的参数列表
+ */
+SELECT PG_GET_FUNCTION_ARGUMENTS(1);
+
+/*
+ 重建标识函数或过程所需的参数列表,其形式需要出现在命令中
+ 例如,此表单省略默认值
+ */
+SELECT PG_GET_FUNCTION_IDENTITY_ARGUMENTS(1);
+
+/*
+ 以函数需要出现的形式重建函数的子句
+ 返回过程
+ */
+SELECT PG_GET_FUNCTION_RESULT(1);
+
+/*
+ 重新构造索引的创建命令
+ 这是反编译的重建,而不是命令的原始文本
+ 如果提供了列且不为零,则仅重建该列的定义
+ */
+SELECT PG_GET_INDEXDEF(1);
+
+/*
+ 返回一组描述服务器识别的 SQL 关键字的记录
+ 单词列包含关键字,
+ catcode 列包含一个类别代码：对于非保留关键字,对于可以是列名称的关键,对于可以是类型或函数名称的关键字,或者对于完全保留的关键字
+ barelabel 列包含关键字是否可以用作列表中的“barelabel”列标签，或者是否只能在之后使用
+ catdesc 列包含一个可能本地化的字符串，用于描述关键字的类别
+ baredesc 列包含一个可能本地化的字符串,用于描述关键字的列标签状态
+ */
+SELECT PG_GET_KEYWORDS();
+
+/*
+ 重新构造规则的创建命令
+ 这是反编译的重建,而不是命令的原始文本
+ */
+SELECT PG_GET_RULEDEF(1);
+
+/*
+ 返回与列关联的序列的名称,如果没有序列与列关联,则返回 NULL
+ 如果列是标识列,则关联的序列是内部为该列创建的序列
+ 对于使用序列类型 （、、） 之一创建的列,它是为该序列列定义创建的序列
+ 在后一种情况下,可以使用修改或删除关联
+ 这个函数可能应该被调用,它的当前名称反映了它历史上一直与串行类型列一起使用的事实
+ 第一个参数是具有可选架构的表名,第二个参数是列名,
+ 由于第一个参数可能包含架构和表名称,因此会根据通常的 SQL 规则对其进行解析,这意味着默认情况下它是小写的
+ 第二个参数只是一个列名,从字面上处理,因此保留其大小写.
+ 结果经过适当的格式化,可以传递给序列函数
+ */
+SELECT PG_GET_SERIAL_SEQUENCE('users', 'id');
+
+/*
+ 重新构造扩展统计信息对象的创建命令
+ 这是反编译的重建,而不是命令的原始文本
+ */
+-- TODO 待完善
+
+/*
+ 重新构造触发器的创建命令
+ 这是反编译的重建,而不是命令的原始文本
+ */
+SELECT PG_GET_TRIGGERDEF(1);
+
+/*
+ 返回给定其 OID 的角色名称
+ */
+SELECT PG_GET_USERBYID(10);
+
+/*
+ 重建视图或实例化视图的基础命令
+ 这是反编译的重建,而不是命令的原始文本
+ */
+SELECT PG_GET_VIEWDEF(1);
+
+/*
+ 测试索引列是否具有命名属性
+ */
+SELECT PG_INDEX_COLUMN_HAS_PROPERTY(1, 1, 'desc');
+
+/*
+ 测试索引是否具有命名属性
+ */
+SELECT PG_INDEX_HAS_PROPERTY(1, 'unique');
+
+/*
+ 测试索引访问方法是否具有命名属性
+ */
+-- TODO 待完善
+
+/*
+ 返回由值表示的存储选项集
+ */
+SELECT PG_OPTIONS_TO_TABLE('{fillfactor=70}');
+
+/*
+ 返回与给定 GUC 关联的标志数组,或者如果它不存在
+ 如果 GUC 存在但没有要显示的标志,则结果为空数组
+ */
+-- TODO 待完善
+
+/*
+ 返回具有存储在指定表空间中的对象的数据库的 OID 集
+ 如果此函数返回任何行,则表空间不为空,无法删除
+ 要识别填充表空间的特定对象,您需要连接到标识的数据库并查询其目录
+ */
+SELECT PG_TABLESPACE_DATABASES(1);
+
+/*
+ 返回此表空间所在的文件系统路径
+ */
+SELECT PG_TABLESPACE_LOCATION(1);
+
+/*
+ 返回传递给它的值的数据类型的 OID
+ 这对于排查或动态构造 SQL 查询很有帮助,该函数被声明为 return
+ 这意味着出于比较目的,它与 OID 相同,但显示为类型名称
+ */
+SELECT PG_TYPEOF(1);
+
+/*
+ 将文本关系名称转换为其 OID
+ */
+SELECT TO_REGCLASS('users');
+
+/*
+ 将文本排序规则名称转换为其 OID
+ */
+SELECT TO_REGCOLLATION('en_US');
+
+/*
+ 将文本架构名称转换为其 OID
+ */
+SELECT TO_REGNAMESPACE('public');
+
+/*
+ 将文本运算符名称转换为其 OID
+ */
+SELECT TO_REGOPER('||');
+
+/*
+ 将文本运算符名称（带有参数类型）转换为其 OID
+ */
+-- TODO 待完善
+SELECT TO_REGOPERATOR('text', '||', 'text');
+
+/*
+ 将文本函数或过程名称转换为其 OID
+ */
+SELECT TO_REGPROC('chr');
+
+/*
+ 将文本函数或过程名称（带有参数类型）转换为其 OID
+ */
+SELECT TO_REGPROCEDURE('chr(int)');
+
+/*
+ 将文本角色名称转换为其 OID
+ */
+SELECT TO_REGROLE('postgres');
+
+/*
+ 将文本类型名称转换为其 OID
+ */
+SELECT TO_REGTYPE('int4');
+
+/* 对象信息和寻址函数 */
+
+/*
+ 返回由目录 OID、对象 OID 和子对象 ID（如表中的列号,引用整个对象时子对象 ID 为零）标识的数据库对象的文本说明
+ 此说明旨在供人类阅读,并且可能会被翻译,具体取决于服务器配置
+ 这对于确定目录中引用的对象的身份特别有用
+ 此函数返回未定义对象的值
+ */
+-- TODO 待完善
+SELECT PG_DESCRIBE_OBJECT;
+
+/*
+ 返回包含足够信息的行,以唯一标识由目录 OID、对象 OID 和子对象 ID 指定的数据库对象
+ 此信息旨在供机器读取,并且永远不会被翻译,
+ 类型标识数据库对象的类型,架构是对象所属的架构名称,或者不属于架构的对象类型,
+ name 是对象的名称,如有必要,如果名称（以及架构名称，如果相关）足以唯一标识对象,则引用
+ 标识是完整的对象标识,其精确格式取决于对象类型,格式中的每个名称都是架构限定的,并根据需要引用
+ 未定义的对象用值标识
+ */
+-- TODO 待完善
 
 
+/* 注释信息函数 */
+
+/*
+ 返回表列的注释,该注释由其表的 OID 及其列号指定
+ */
+-- TODO 待完善
 
 
+/* 事务ID和快照信息函数 */
 
+/*
+ 返回当前事务的 ID
+ 如果当前事务还没有一个新的数据库（因为它没有执行任何数据库更新）,它将分配一个新的
+ */
+SELECT PG_CURRENT_XACT_ID();
 
+/*
+ 返回当前事务的 ID,或者如果尚未分配 ID
+ 如果事务可能是只读的,则最好使用此变体,以避免不必要的 XID 消耗
+ */
+SELECT PG_CURRENT_XACT_ID_IF_ASSIGNED();
 
+/*
+ 报告最近事务的提交状态
+ */
+-- TODO 待完善
 
+/*
+ 返回当前快照,这是一种数据结构,显示当前正在进行的事务 ID
+ */
+SELECT PG_CURRENT_SNAPSHOT();
 
+/*
+ 返回快照中包含的进行中的事务 ID 集
+ */
+-- TODO 待完善
 
+/*
+
+ */
 
 
 
