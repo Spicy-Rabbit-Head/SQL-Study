@@ -352,16 +352,19 @@ VALUES
 -- 创建资料管理架构
 CREATE SCHEMA IF NOT EXISTS information_management;
 
+-- 创建保养规则月份集合域类型
+CREATE DOMAIN information_management.REGULAR_MONTH_COLLECTION AS MAINTENANCE_CYCLE[]
+    CONSTRAINT months_length CHECK (CARDINALITY(VALUE) <= 12);
+
 -- 创建保养周期规则数据表
 CREATE TABLE IF NOT EXISTS information_management.maintenance_cycle_rules
 (
     -- 规则名
-    rule_name VARCHAR(45)                                          NOT NULL UNIQUE,
+    rule_name VARCHAR(45)                                     NOT NULL UNIQUE,
     -- 规则描述
-    rule_desc VARCHAR(100)                                         NOT NULL,
+    rule_desc VARCHAR(100)                                    NOT NULL,
     -- 月份集合
-    months    MAINTENANCE_CYCLE[]
-        CONSTRAINT months_length CHECK (CARDINALITY(months) <= 12) NOT NULL
+    months    information_management.REGULAR_MONTH_COLLECTION NOT NULL
 );
 
 -- 添加规则数据表注释
@@ -369,6 +372,8 @@ COMMENT ON TABLE information_management.maintenance_cycle_rules IS '规则数据
 COMMENT ON COLUMN information_management.maintenance_cycle_rules.rule_name IS '规则名';
 COMMENT ON COLUMN information_management.maintenance_cycle_rules.rule_desc IS '规则描述';
 COMMENT ON COLUMN information_management.maintenance_cycle_rules.months IS '月份集合,保养周期的枚举数组';
+
+TRUNCATE information_management.maintenance_cycle_rules;
 
 -- 添加测试规则数据
 INSERT
@@ -378,40 +383,73 @@ INTO
 VALUES
     ('规则一',
      '一月年保的规则',
-     ARRAY ['年','月','月','季','月','月','半年','月','月','季','月','月']::MAINTENANCE_CYCLE[]),
+     ARRAY ['年','月','月','季','月','月','半年','月','月','季','月','月']::information_management.REGULAR_MONTH_COLLECTION),
     ('规则二',
      '二月年保的规则',
-     ARRAY ['月','年','月','月','季','月','月','半年','月','月','季','月']::MAINTENANCE_CYCLE[]),
+     ARRAY ['月','年','月','月','季','月','月','半年','月','月','季','月']::information_management.REGULAR_MONTH_COLLECTION),
     ('规则三',
      '三月年保的规则',
-     ARRAY ['月','月','年','月','月','季','月','月','半年','月','月','季']::MAINTENANCE_CYCLE[]),
+     ARRAY ['月','月','年','月','月','季','月','月','半年','月','月','季']::information_management.REGULAR_MONTH_COLLECTION),
     ('规则四',
      '四月年保的规则',
-     ARRAY ['季','月','月','年','月','月','季','月','月','半年','月','月']::MAINTENANCE_CYCLE[]),
+     ARRAY ['季','月','月','年','月','月','季','月','月','半年','月','月']::information_management.REGULAR_MONTH_COLLECTION),
     ('规则五',
      '五月年保的规则',
-     ARRAY ['月','季','月','月','年','月','月','季','月','月','半年','月']::MAINTENANCE_CYCLE[]),
+     ARRAY ['月','季','月','月','年','月','月','季','月','月','半年','月']::information_management.REGULAR_MONTH_COLLECTION),
     ('规则六',
      '六月年保的规则',
-     ARRAY ['月','月','季','月','月','年','月','月','季','月','月','半年']::MAINTENANCE_CYCLE[]),
+     ARRAY ['月','月','季','月','月','年','月','月','季','月','月','半年']::information_management.REGULAR_MONTH_COLLECTION),
     ('规则七',
      '七月年保的规则',
-     ARRAY ['半年','月','月','季','月','月','年','月','月','季','月','月']::MAINTENANCE_CYCLE[]),
+     ARRAY ['半年','月','月','季','月','月','年','月','月','季','月','月']::information_management.REGULAR_MONTH_COLLECTION),
     ('规则八',
      '八月年保的规则',
-     ARRAY ['月','半年','月','月','季','月','月','年','月','月','季','月']::MAINTENANCE_CYCLE[]),
+     ARRAY ['月','半年','月','月','季','月','月','年','月','月','季','月']::information_management.REGULAR_MONTH_COLLECTION),
     ('规则九',
      '九月年保的规则',
-     ARRAY ['月','月','半年','月','月','季','月','月','年','月','月','季']::MAINTENANCE_CYCLE[]),
+     ARRAY ['月','月','半年','月','月','季','月','月','年','月','月','季']::information_management.REGULAR_MONTH_COLLECTION),
     ('规则十',
      '十月年保的规则',
-     ARRAY ['季','月','月','半年','月','月','季','月','月','年','月','月']::MAINTENANCE_CYCLE[]),
+     ARRAY ['季','月','月','半年','月','月','季','月','月','年','月','月']::information_management.REGULAR_MONTH_COLLECTION),
     ('规则十一',
      '十一月年保的规则',
-     ARRAY ['月','季','月','月','半年','月','月','季','月','月','年','月']::MAINTENANCE_CYCLE[]),
+     ARRAY ['月','季','月','月','半年','月','月','季','月','月','年','月']::information_management.REGULAR_MONTH_COLLECTION),
     ('规则十二',
      '十二月年保的规则',
-     ARRAY ['月','月','季','月','月','半年','月','月','季','月','月','年']::MAINTENANCE_CYCLE[]);
+     ARRAY ['月','月','季','月','月','半年','月','月','季','月','月','年']::information_management.REGULAR_MONTH_COLLECTION);
+
+-- 创建机台资料数据表
+CREATE TABLE IF NOT EXISTS information_management.equipment_data
+(
+    -- 设备编号
+    device_number                        VARCHAR(45) PRIMARY KEY UNIQUE,
+    -- 设备名称
+    device_name                          VARCHAR(45) NOT NULL,
+    -- 设备型号
+    device_model                         VARCHAR(80) NOT NULL,
+    -- 制作厂商
+    manufacturer                         VARCHAR(45) NOT NULL,
+    -- 车间
+    workshop                             VARCHAR(45) NOT NULL,
+    -- 站别
+    station                              VARCHAR(45) NOT NULL,
+    -- 位置
+    location                             VARCHAR(45) NOT NULL,
+    -- 设备状态
+    device_status                        VARCHAR(45) NOT NULL,
+    -- 是否有效
+    is_valid                             BOOLEAN     NOT NULL,
+    -- 保养周期规则名
+    rule_name                            VARCHAR(45) NOT NULL,
+    -- 启用日期
+    enable_date                          DATE        NOT NULL,
+    -- 保养基准文号
+    maintenance_standard_document_number VARCHAR(45) NOT NULL,
+    -- OIS文号
+    ois_document_number                  VARCHAR(45) NOT NULL,
+    -- 每日设备巡检基准
+    daily_equipment_inspection_standard  VARCHAR(45)
+);
 
 
 -- 创建备品管理架构
