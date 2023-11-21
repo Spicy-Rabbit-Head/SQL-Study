@@ -4,13 +4,19 @@
 -- 创建保养周期枚举
 CREATE TYPE MAINTENANCE_CYCLE AS ENUM ('月', '季', '半年', '年');
 
-
 /*
  先执行数据库创建文件,
  切换数据库后再执行当前文件
  */
 -- 创建用户管理架构
 CREATE SCHEMA IF NOT EXISTS user_management;
+
+-- 创建用户归属
+CREATE TYPE BELONG AS ENUM (
+    '领导',
+    '保养',
+    '换靶'
+    );
 
 -- 创建用户表
 CREATE TABLE IF NOT EXISTS user_management.user_data
@@ -21,6 +27,10 @@ CREATE TABLE IF NOT EXISTS user_management.user_data
     username VARCHAR(45)  NOT NULL,
     -- 密码
     password VARCHAR(200) NOT NULL,
+    -- 姓名
+    name     VARCHAR(45)  NOT NULL,
+    -- 归属
+    belong   BELONG       NOT NULL,
     -- 邮箱
     email    VARCHAR(45),
     -- 通用唯一识别码
@@ -32,6 +42,8 @@ COMMENT ON TABLE user_management.user_data IS '用户表';
 COMMENT ON COLUMN user_management.user_data.id IS '用户主键';
 COMMENT ON COLUMN user_management.user_data.username IS '用户名';
 COMMENT ON COLUMN user_management.user_data.password IS '密码';
+COMMENT ON COLUMN user_management.user_data.name IS '姓名';
+COMMENT ON COLUMN user_management.user_data.belong IS '归属';
 COMMENT ON COLUMN user_management.user_data.email IS '邮箱';
 COMMENT ON COLUMN user_management.user_data.uuid IS '通用唯一识别码';
 
@@ -39,9 +51,9 @@ COMMENT ON COLUMN user_management.user_data.uuid IS '通用唯一识别码';
 INSERT
 INTO
     user_management.user_data
-    (username, password)
+    (username, password, name, belong)
 VALUES
-    ('test1', '$2a$10$jA7HB7UEwmmq81Sty3frAegQHbbsuHH.JFzqMi8M1Ry96TWjXgE6i');
+    ('test1', '$2a$10$jA7HB7UEwmmq81Sty3frAegQHbbsuHH.JFzqMi8M1Ry96TWjXgE6i', '测试', '保养');
 
 -- 创建角色表
 CREATE TABLE IF NOT EXISTS user_management.role
@@ -308,47 +320,6 @@ COMMENT ON COLUMN maintenance_management.scheduling_data.member IS '成员';
 COMMENT ON COLUMN maintenance_management.scheduling_data.operation_time IS '作业时间';
 COMMENT ON COLUMN maintenance_management.scheduling_data.scheduling_status IS '排程状态';
 
--- 添加测试排程数据
-INSERT
-INTO
-    maintenance_management.scheduling_data
-    (workshop,
-     equipment_number,
-     equipment_model_number,
-     equipment_name,
-     maintenance_cycle,
-     plan_time,
-     scheduling_time,
-     person_in_charge,
-     member,
-     scheduling_status)
-VALUES
-    ('製造一部車間', 'N1001', '机台型号', '排片', '月', '2020-01-11', '上午', '张三', '李四', TRUE),
-    ('製造二部車間', 'N1002', '机台型号', '排片', '月', '2020-01-12', '上午', '张三', '李四', FALSE),
-    ('製造三部車間', 'N1003', '机台型号', '排片', '月', '2020-01-13', '上午', '张三', '李四', FALSE),
-    ('製造一部車間', 'N1004', '机台型号', '排片', '月', '2020-01-14', '上午', '张三', '李四', TRUE),
-    ('製造二部車間', 'N1005', '机台型号', '排片', '月', '2020-01-15', '上午', '张三', '李四', FALSE),
-    ('製造三部車間', 'N1006', '机台型号', '排片', '月', '2020-01-16', '上午', '张三', '李四', FALSE),
-    ('製造一部車間', 'N1007', '机台型号', '排片', '月', '2020-01-17', '上午', '张三', '李四', TRUE),
-    ('製造二部車間', 'N1008', '机台型号', '排片', '月', '2020-01-18', '上午', '张三', '李四', FALSE),
-    ('製造三部車間', 'N1009', '机台型号', '排片', '月', '2020-01-19', '上午', '张三', '李四', FALSE),
-    ('製造一部車間', 'N1010', '机台型号', '排片', '月', '2020-01-20', '上午', '张三', '李四', TRUE),
-    ('製造二部車間', 'N1011', '机台型号', '排片', '月', '2020-01-21', '上午', '张三', '李四', FALSE),
-    ('製造三部車間', 'N1012', '机台型号', '排片', '月', '2020-01-22', '上午', '张三', '李四', FALSE),
-    ('製造一部車間', 'N1013', '机台型号', '排片', '月', '2020-01-23', '上午', '张三', '李四', TRUE),
-    ('製造二部車間', 'N1014', '机台型号', '排片', '月', '2020-01-24', '上午', '张三', '李四', FALSE),
-    ('製造三部車間', 'N1015', '机台型号', '排片', '月', '2020-01-25', '上午', '张三', '李四', FALSE),
-    ('製造一部車間', 'N1016', '机台型号', '排片', '月', '2020-01-26', '上午', '张三', '李四', TRUE),
-    ('製造二部車間', 'N1017', '机台型号', '排片', '月', '2020-01-27', '上午', '张三', '李四', FALSE),
-    ('製造三部車間', 'N1018', '机台型号', '排片', '月', '2020-01-28', '上午', '张三', '李四', FALSE),
-    ('製造一部車間', 'N1019', '机台型号', '排片', '月', '2020-01-29', '上午', '张三', '李四', TRUE),
-    ('製造二部車間', 'N1020', '机台型号', '排片', '月', '2020-01-30', '上午', '张三', '李四', FALSE),
-    ('製造三部車間', 'N1021', '机台型号', '排片', '月', '2020-01-31', '上午', '张三', '李四', FALSE),
-    ('製造一部車間', 'N1022', '机台型号', '排片', '月', '2020-02-01', '上午', '张三', '李四', TRUE),
-    ('製造二部車間', 'N1023', '机台型号', '排片', '月', '2020-02-02', '上午', '张三', '李四', FALSE),
-    ('製造三部車間', 'N1024', '机台型号', '排片', '月', '2020-02-03', '上午', '张三', '李四', FALSE);
-
-
 -- 创建资料管理架构
 CREATE SCHEMA IF NOT EXISTS information_management;
 
@@ -356,11 +327,14 @@ CREATE SCHEMA IF NOT EXISTS information_management;
 CREATE DOMAIN information_management.REGULAR_MONTH_COLLECTION AS MAINTENANCE_CYCLE[]
     CONSTRAINT months_length CHECK (CARDINALITY(VALUE) <= 12);
 
+-- 创建保养项目枚举类型
+CREATE TYPE information_management.MAINTENANCE_ITEM_TYPE AS ENUM ('计划性','预测性');
+
 -- 创建保养周期规则数据表
 CREATE TABLE IF NOT EXISTS information_management.maintenance_cycle_rules
 (
     -- 规则名
-    rule_name VARCHAR(45)                                     NOT NULL UNIQUE,
+    rule_name VARCHAR(45) PRIMARY KEY,
     -- 规则描述
     rule_desc VARCHAR(100)                                    NOT NULL,
     -- 月份集合
@@ -373,83 +347,177 @@ COMMENT ON COLUMN information_management.maintenance_cycle_rules.rule_name IS '�
 COMMENT ON COLUMN information_management.maintenance_cycle_rules.rule_desc IS '规则描述';
 COMMENT ON COLUMN information_management.maintenance_cycle_rules.months IS '月份集合,保养周期的枚举数组';
 
-TRUNCATE information_management.maintenance_cycle_rules;
-
--- 添加测试规则数据
-INSERT
-INTO
-    information_management.maintenance_cycle_rules
-    (rule_name, rule_desc, months)
-VALUES
-    ('规则一',
-     '一月年保的规则',
-     ARRAY ['年','月','月','季','月','月','半年','月','月','季','月','月']::information_management.REGULAR_MONTH_COLLECTION),
-    ('规则二',
-     '二月年保的规则',
-     ARRAY ['月','年','月','月','季','月','月','半年','月','月','季','月']::information_management.REGULAR_MONTH_COLLECTION),
-    ('规则三',
-     '三月年保的规则',
-     ARRAY ['月','月','年','月','月','季','月','月','半年','月','月','季']::information_management.REGULAR_MONTH_COLLECTION),
-    ('规则四',
-     '四月年保的规则',
-     ARRAY ['季','月','月','年','月','月','季','月','月','半年','月','月']::information_management.REGULAR_MONTH_COLLECTION),
-    ('规则五',
-     '五月年保的规则',
-     ARRAY ['月','季','月','月','年','月','月','季','月','月','半年','月']::information_management.REGULAR_MONTH_COLLECTION),
-    ('规则六',
-     '六月年保的规则',
-     ARRAY ['月','月','季','月','月','年','月','月','季','月','月','半年']::information_management.REGULAR_MONTH_COLLECTION),
-    ('规则七',
-     '七月年保的规则',
-     ARRAY ['半年','月','月','季','月','月','年','月','月','季','月','月']::information_management.REGULAR_MONTH_COLLECTION),
-    ('规则八',
-     '八月年保的规则',
-     ARRAY ['月','半年','月','月','季','月','月','年','月','月','季','月']::information_management.REGULAR_MONTH_COLLECTION),
-    ('规则九',
-     '九月年保的规则',
-     ARRAY ['月','月','半年','月','月','季','月','月','年','月','月','季']::information_management.REGULAR_MONTH_COLLECTION),
-    ('规则十',
-     '十月年保的规则',
-     ARRAY ['季','月','月','半年','月','月','季','月','月','年','月','月']::information_management.REGULAR_MONTH_COLLECTION),
-    ('规则十一',
-     '十一月年保的规则',
-     ARRAY ['月','季','月','月','半年','月','月','季','月','月','年','月']::information_management.REGULAR_MONTH_COLLECTION),
-    ('规则十二',
-     '十二月年保的规则',
-     ARRAY ['月','月','季','月','月','半年','月','月','季','月','月','年']::information_management.REGULAR_MONTH_COLLECTION);
-
--- 创建机台资料数据表
-CREATE TABLE IF NOT EXISTS information_management.equipment_data
+-- 创建设备资料数据表
+CREATE TABLE IF NOT EXISTS information_management.device_data
 (
     -- 设备编号
-    device_number                        VARCHAR(45) PRIMARY KEY UNIQUE,
+    device_number               VARCHAR(45) PRIMARY KEY,
     -- 设备名称
-    device_name                          VARCHAR(45) NOT NULL,
+    device_name                 VARCHAR(45) NOT NULL,
     -- 设备型号
-    device_model                         VARCHAR(80) NOT NULL,
+    device_model                VARCHAR(80) NOT NULL,
     -- 制作厂商
-    manufacturer                         VARCHAR(45) NOT NULL,
+    manufacturer                VARCHAR(45) NOT NULL,
     -- 车间
-    workshop                             VARCHAR(45) NOT NULL,
+    workshop                    VARCHAR(45) NOT NULL,
     -- 站别
-    station                              VARCHAR(45) NOT NULL,
+    station                     VARCHAR(45) NOT NULL,
     -- 位置
-    location                             VARCHAR(45) NOT NULL,
+    location                    VARCHAR(45) NOT NULL,
     -- 设备状态
-    device_status                        VARCHAR(45) NOT NULL,
+    device_status               VARCHAR(45) NOT NULL,
     -- 是否有效
-    is_valid                             BOOLEAN     NOT NULL,
+    is_valid                    BOOLEAN     NOT NULL,
     -- 保养周期规则名
-    rule_name                            VARCHAR(45) NOT NULL,
+    rule_name                   VARCHAR(45) NOT NULL,
     -- 启用日期
-    enable_date                          DATE        NOT NULL,
+    enable_date                 SMALLINT    NOT NULL
+        CHECK (enable_date BETWEEN 1 AND 28),
     -- 保养基准文号
-    maintenance_standard_document_number VARCHAR(45) NOT NULL,
+    benchmark_document_number   VARCHAR(45) NOT NULL,
     -- OIS文号
-    ois_document_number                  VARCHAR(45) NOT NULL,
+    ois_document_number         VARCHAR(45) NOT NULL,
     -- 每日设备巡检基准
-    daily_equipment_inspection_standard  VARCHAR(45)
+    device_inspection_benchmark VARCHAR(45),
+    -- 变更日期
+    change_date                 TIMESTAMP   NOT NULL
 );
+
+-- 添加机台资料数据表注释
+COMMENT ON TABLE information_management.device_data IS '机台资料数据表';
+COMMENT ON COLUMN information_management.device_data.device_number IS '设备编号';
+COMMENT ON COLUMN information_management.device_data.device_name IS '设备名称';
+COMMENT ON COLUMN information_management.device_data.device_model IS '设备型号';
+COMMENT ON COLUMN information_management.device_data.manufacturer IS '制作厂商';
+COMMENT ON COLUMN information_management.device_data.workshop IS '车间';
+COMMENT ON COLUMN information_management.device_data.station IS '站别';
+COMMENT ON COLUMN information_management.device_data.location IS '位置';
+COMMENT ON COLUMN information_management.device_data.device_status IS '设备状态';
+COMMENT ON COLUMN information_management.device_data.is_valid IS '是否有效';
+COMMENT ON COLUMN information_management.device_data.rule_name IS '保养周期规则名';
+COMMENT ON COLUMN information_management.device_data.enable_date IS '启用日期';
+COMMENT ON COLUMN information_management.device_data.benchmark_document_number IS '保养基准文号';
+COMMENT ON COLUMN information_management.device_data.ois_document_number IS 'OIS文号';
+COMMENT ON COLUMN information_management.device_data.device_inspection_benchmark IS '每日设备巡检基准';
+COMMENT ON COLUMN information_management.device_data.change_date IS '变更日期';
+
+-- 创建保养基准数据表
+CREATE TABLE IF NOT EXISTS information_management.maintenance_benchmark_document
+(
+    -- 保养基准文号
+    benchmark_document_number VARCHAR(45) PRIMARY KEY,
+    -- 保养基准描述
+    document_desc             VARCHAR(100) NOT NULL,
+    -- 站别
+    station                   VARCHAR(45)  NOT NULL,
+    -- 版本
+    version                   VARCHAR(45)  NOT NULL,
+    -- 文件地址
+    file_address              VARCHAR(100) NOT NULL,
+    -- 保养项目
+    item_number               SMALLINT[]   NOT NULL,
+    -- 变更日期
+    change_date               TIMESTAMP    NOT NULL
+);
+
+-- 添加保养基准数据表注释
+COMMENT ON TABLE information_management.maintenance_benchmark_document IS '保养基准数据表';
+COMMENT ON COLUMN information_management.maintenance_benchmark_document.benchmark_document_number IS '保养基准文号';
+COMMENT ON COLUMN information_management.maintenance_benchmark_document.document_desc IS '保养基准描述';
+COMMENT ON COLUMN information_management.maintenance_benchmark_document.station IS '站别';
+COMMENT ON COLUMN information_management.maintenance_benchmark_document.version IS '版本';
+COMMENT ON COLUMN information_management.maintenance_benchmark_document.file_address IS '文件地址';
+COMMENT ON COLUMN information_management.maintenance_benchmark_document.item_number IS '保养项目';
+COMMENT ON COLUMN information_management.maintenance_benchmark_document.change_date IS '变更日期';
+
+-- 创建OIS数据表
+CREATE TABLE IF NOT EXISTS information_management.ois_document
+(
+    -- OIS文号
+    ois_document_number VARCHAR(45) PRIMARY KEY,
+    -- OIS描述
+    document_desc       VARCHAR(100) NOT NULL,
+    -- 站别
+    station             VARCHAR(45)  NOT NULL,
+    -- 版本
+    version             VARCHAR(45)  NOT NULL,
+    -- 文件地址
+    file_address        VARCHAR(100) NOT NULL,
+    -- 变更日期
+    change_date         TIMESTAMP    NOT NULL
+);
+
+-- 添加OIS数据表注释
+COMMENT ON TABLE information_management.ois_document IS 'OIS数据表';
+COMMENT ON COLUMN information_management.ois_document.ois_document_number IS 'OIS文号';
+COMMENT ON COLUMN information_management.ois_document.document_desc IS 'OIS描述';
+COMMENT ON COLUMN information_management.ois_document.station IS '站别';
+COMMENT ON COLUMN information_management.ois_document.version IS '版本';
+COMMENT ON COLUMN information_management.ois_document.file_address IS '文件地址';
+COMMENT ON COLUMN information_management.ois_document.change_date IS '变更日期';
+
+-- 创建设备巡检基准数据表
+CREATE TABLE IF NOT EXISTS information_management.device_inspection_document
+(
+    -- 设备巡检基准
+    device_inspection_benchmark VARCHAR(45) PRIMARY KEY,
+    -- 设备巡检基准描述
+    document_desc               VARCHAR(100) NOT NULL,
+    -- 站别
+    station                     VARCHAR(45)  NOT NULL,
+    -- 版本
+    version                     VARCHAR(45)  NOT NULL,
+    -- 文件地址
+    file_address                VARCHAR(100) NOT NULL,
+    -- 变更日期
+    change_date                 TIMESTAMP    NOT NULL
+);
+
+-- 添加设备巡检基准数据表注释
+COMMENT ON TABLE information_management.device_inspection_document IS '设备巡检基准数据表';
+COMMENT ON COLUMN information_management.device_inspection_document.device_inspection_benchmark IS '设备巡检基准';
+COMMENT ON COLUMN information_management.device_inspection_document.document_desc IS '设备巡检基准描述';
+COMMENT ON COLUMN information_management.device_inspection_document.station IS '站别';
+COMMENT ON COLUMN information_management.device_inspection_document.version IS '版本';
+COMMENT ON COLUMN information_management.device_inspection_document.file_address IS '文件地址';
+COMMENT ON COLUMN information_management.device_inspection_document.change_date IS '变更日期';
+
+-- 创建保养项目数据表
+CREATE TABLE IF NOT EXISTS information_management.maintenance_item
+(
+    -- ID
+    id                SERIAL PRIMARY KEY,
+    -- 项目编号
+    item_number       SMALLINT                                     NOT NULL,
+    -- 机台型号
+    device_model      VARCHAR(80)                                  NOT NULL,
+    -- 保养项目
+    maintenance_item  VARCHAR(45)                                  NOT NULL,
+    -- 保养项目描述
+    item_desc         VARCHAR(100)                                 NOT NULL,
+    -- 项目类型
+    item_type         information_management.MAINTENANCE_ITEM_TYPE NOT NULL,
+    -- 保养周期
+    maintenance_cycle MAINTENANCE_CYCLE                            NOT NULL,
+    -- 是否是模组
+    is_module         BOOLEAN                                      NOT NULL,
+    -- 备品编号
+    spare_part_number SMALLINT,
+    -- 备品使用量
+    quantity          SMALLINT
+);
+
+-- 添加保养项目数据表注释
+COMMENT ON TABLE information_management.maintenance_item IS '保养项目数据表';
+COMMENT ON COLUMN information_management.maintenance_item.id IS 'ID';
+COMMENT ON COLUMN information_management.maintenance_item.item_number IS '项目编号';
+COMMENT ON COLUMN information_management.maintenance_item.maintenance_item IS '保养项目';
+COMMENT ON COLUMN information_management.maintenance_item.item_desc IS '保养项目描述';
+COMMENT ON COLUMN information_management.maintenance_item.item_type IS '项目类型';
+COMMENT ON COLUMN information_management.maintenance_item.maintenance_cycle IS '保养周期';
+COMMENT ON COLUMN information_management.maintenance_item.is_module IS '是否是模组';
+COMMENT ON COLUMN information_management.maintenance_item.spare_part_number IS '备品编号';
+COMMENT ON COLUMN information_management.maintenance_item.quantity IS '备品使用量';
 
 
 -- 创建备品管理架构
@@ -458,14 +526,12 @@ CREATE SCHEMA IF NOT EXISTS spare_parts_management;
 -- 创建备品数据表
 CREATE TABLE IF NOT EXISTS spare_parts_management.spare_parts_data
 (
-    -- 主键id
-    id                SERIAL PRIMARY KEY,
     -- 备品编号
-    spare_part_number VARCHAR(45) NOT NULL,
+    spare_part_number SERIAL PRIMARY KEY,
     -- 备品料号
     part_number       VARCHAR(45),
     -- 备品名称
-    spare_part_name   VARCHAR(45) NOT NULL,
+    spare_part_name   VARCHAR(45)    NOT NULL UNIQUE,
     -- 品牌
     brand             VARCHAR(45),
     -- 图号
@@ -473,12 +539,11 @@ CREATE TABLE IF NOT EXISTS spare_parts_management.spare_parts_data
     -- 图片链接
     image_link        VARCHAR(100),
     -- 价格
-    price             VARCHAR(45) NOT NULL
+    price             DECIMAL(10, 2) NOT NULL
 );
 
 -- 添加备品数据表注释
 COMMENT ON TABLE spare_parts_management.spare_parts_data IS '备品数据表';
-COMMENT ON COLUMN spare_parts_management.spare_parts_data.id IS '主键id';
 COMMENT ON COLUMN spare_parts_management.spare_parts_data.spare_part_number IS '备品编号';
 COMMENT ON COLUMN spare_parts_management.spare_parts_data.part_number IS '备品料号';
 COMMENT ON COLUMN spare_parts_management.spare_parts_data.spare_part_name IS '备品名称';
@@ -486,24 +551,3 @@ COMMENT ON COLUMN spare_parts_management.spare_parts_data.brand IS '品牌';
 COMMENT ON COLUMN spare_parts_management.spare_parts_data.drawing_number IS '图号';
 COMMENT ON COLUMN spare_parts_management.spare_parts_data.image_link IS '图片链接';
 COMMENT ON COLUMN spare_parts_management.spare_parts_data.price IS '价格';
-
--- 添加测试备品数据
-INSERT
-INTO
-    spare_parts_management.spare_parts_data
-    (spare_part_number, part_number, spare_part_name, brand, drawing_number, image_link, price)
-VALUES
-    ('N1001', '1001', '备品名称1', '品牌1', NULL, '图片链接', '100'),
-    ('N1002', '1002', '备品名称2', '品牌1', '图号', '图片链接', '100'),
-    ('N1003', '1003', '备品名称3', '品牌1', '图号', '图片链接', '100'),
-    ('N1004', '1004', '备品名称4', '品牌2', '图号', '图片链接', '100'),
-    ('N1005', '1005', '备品名称5', '品牌2', NULL, '图片链接', '100'),
-    ('N1006', '1006', '备品名称6', '品牌3', '图号', '图片链接', '100'),
-    ('N1007', '1007', '备品名称7', '品牌4', '图号', '图片链接', '100'),
-    ('N1008', '1008', '备品名称8', '品牌4', NULL, '图片链接', '100'),
-    ('N1009', '1009', '备品名称9', '品牌5', '图号', '图片链接', '100'),
-    ('N1010', '1010', '备品名称10', '品牌5', '图号', '图片链接', '100'),
-    ('N1011', '1011', '备品名称11', '品牌5', '图号', '图片链接', '100');
-
-
-
