@@ -2,7 +2,7 @@
   全局枚举类型
  */
 -- 创建保养周期枚举
-CREATE TYPE MAINTENANCE_CYCLE AS ENUM ('月', '季', '半年', '年');
+CREATE TYPE MAINTENANCE_CYCLE AS ENUM ('月', '季度', '半年', '年');
 
 /*
  先执行数据库创建文件,
@@ -46,14 +46,6 @@ COMMENT ON COLUMN user_management.user_data.name IS '姓名';
 COMMENT ON COLUMN user_management.user_data.belong IS '归属';
 COMMENT ON COLUMN user_management.user_data.email IS '邮箱';
 COMMENT ON COLUMN user_management.user_data.uuid IS '通用唯一识别码';
-
--- 添加测试用户
-INSERT
-INTO
-    user_management.user_data
-    (username, password, name, belong)
-VALUES
-    ('test1', '$2a$10$jA7HB7UEwmmq81Sty3frAegQHbbsuHH.JFzqMi8M1Ry96TWjXgE6i', '测试', '保养');
 
 -- 创建角色表
 CREATE TABLE IF NOT EXISTS user_management.role
@@ -113,7 +105,8 @@ INTO
     user_management.user_role_link
     (user_id, role_id)
 VALUES
-    (1, 1);
+    (1, 1),
+    (15, 1);
 
 -- 创建菜单权限表
 CREATE TABLE IF NOT EXISTS user_management.menu_permissions
@@ -143,6 +136,7 @@ COMMENT ON COLUMN user_management.menu_permissions.group_name IS '分组';
 COMMENT ON COLUMN user_management.menu_permissions.menu_name IS '菜单名';
 COMMENT ON COLUMN user_management.menu_permissions.parent_id IS '父菜单标识';
 COMMENT ON COLUMN user_management.menu_permissions.path IS '地址';
+COMMENT ON COLUMN user_management.menu_permissions.component_path IS '组件地址';
 COMMENT ON COLUMN user_management.menu_permissions.icon IS '图标';
 COMMENT ON COLUMN user_management.menu_permissions.menu_desc IS '菜单描述';
 
@@ -152,12 +146,15 @@ INTO
     user_management.menu_permissions
     (group_name, menu_name, parent_id, path, component_path, icon, menu_desc)
 VALUES
-    ('主页', 'Home', 0, '/maintenance-schedule', 'homePage/PersonalHomePage', NULL, '主页'),
+    ('主页', 'Home', 0, '/maintenance-schedule', 'homePage/Home', NULL, '主页'),
     ('保养相关', 'MaintenanceSchedule', 0, '/maintenance-schedule', NULL, NULL, '保养排程'),
     ('保养相关', 'Schedule', 2, '/schedule', 'maintenanceSchedule/Schedule', NULL, '保养排程机台'),
     ('保养相关', 'ScheduleOther', 2, '/schedule-other', 'maintenanceSchedule/ScheduleOther', NULL, '保養排程其他'),
     ('保养相关', 'MaintenancePreparation', 0, '/maintenance-preparation', NULL, NULL, '保养准备'),
-    ('保养相关', 'PrepareSupplies', 5, '/prepare-supplies', 'maintenancePreparation/PrepareSupplies', NULL, '备品准备');
+    ('保养相关', 'PrepareSupplies', 5, '/prepare-supplies', 'maintenancePreparation/PrepareSupplies', NULL, '备品准备'),
+    ('资料相关', 'InformationManagement', 0, '/information-management', NULL, NULL, '资料管理'),
+    ('资料相关', 'DeviceData', 7, '/device-data', 'information-management/DeviceData', NULL, '设备数据');
+
 
 -- 创建角色菜单权限外键表
 CREATE TABLE IF NOT EXISTS user_management.role_menu_link
@@ -194,7 +191,9 @@ VALUES
     (1, 3),
     (1, 4),
     (1, 5),
-    (1, 6);
+    (1, 6),
+    (1, 7),
+    (1, 8);
 
 -- 创建操作权限表
 CREATE TABLE IF NOT EXISTS user_management.operation_permissions
@@ -246,33 +245,6 @@ COMMENT ON COLUMN user_management.role_operation_link.id IS '主键id';
 COMMENT ON COLUMN user_management.role_operation_link.role_id IS '角色主键';
 COMMENT ON COLUMN user_management.role_operation_link.operation_id IS '操作权限主键';
 
--- 创建成员表
-CREATE TABLE IF NOT EXISTS user_management.member
-(
-    -- 成员名
-    member_name VARCHAR NOT NULL
-);
-
--- 添加成员表注释
-COMMENT ON TABLE user_management.member IS '成员表';
-COMMENT ON COLUMN user_management.member.member_name IS '成员名';
-
--- 添加测试成员
-INSERT
-INTO
-    user_management.member
-VALUES
-    ('李浩勇'),
-    ('刘佳辉'),
-    ('孙楠'),
-    ('王斌'),
-    ('王立虎'),
-    ('王璇'),
-    ('伍英贤'),
-    ('郁华'),
-    ('赵子奎'),
-    ('全员');
-
 
 -- 创建保养管理架构
 CREATE SCHEMA IF NOT EXISTS maintenance_management;
@@ -303,7 +275,7 @@ CREATE TABLE IF NOT EXISTS maintenance_management.scheduling_data
     -- 作业时间
     operation_time         DATE,
     -- 排程状态
-    scheduling_status      BOOLEAN     NOT NULL
+    scheduling_status      BOOLEAN
 );
 
 -- 添加排程数据表注释
@@ -369,14 +341,14 @@ CREATE TABLE IF NOT EXISTS information_management.device_data
     -- 是否有效
     is_valid                    BOOLEAN     NOT NULL,
     -- 保养周期规则名
-    rule_name                   VARCHAR(45) NOT NULL,
+    rule_name                   VARCHAR(45),
     -- 启用日期
-    enable_date                 SMALLINT    NOT NULL
+    enable_date                 SMALLINT
         CHECK (enable_date BETWEEN 1 AND 28),
     -- 保养基准文号
-    benchmark_document_number   VARCHAR(45) NOT NULL,
+    benchmark_document_number   VARCHAR(45),
     -- OIS文号
-    ois_document_number         VARCHAR(45) NOT NULL,
+    ois_document_number         VARCHAR(45),
     -- 每日设备巡检基准
     device_inspection_benchmark VARCHAR(45),
     -- 变更日期
@@ -415,7 +387,7 @@ CREATE TABLE IF NOT EXISTS information_management.maintenance_benchmark_document
     -- 文件地址
     file_address              VARCHAR(100) NOT NULL,
     -- 保养项目
-    item_number               SMALLINT[]   NOT NULL,
+    item_number               SMALLINT[],
     -- 变更日期
     change_date               TIMESTAMP    NOT NULL
 );
@@ -551,3 +523,30 @@ COMMENT ON COLUMN spare_parts_management.spare_parts_data.brand IS '品牌';
 COMMENT ON COLUMN spare_parts_management.spare_parts_data.drawing_number IS '图号';
 COMMENT ON COLUMN spare_parts_management.spare_parts_data.image_link IS '图片链接';
 COMMENT ON COLUMN spare_parts_management.spare_parts_data.price IS '价格';
+
+-- 项目费用数据表
+CREATE TABLE IF NOT EXISTS spare_parts_management.item_cost
+(
+    -- 主键id
+    id                SERIAL PRIMARY KEY,
+    -- 设备编号
+    device_number     VARCHAR(45)       NOT NULL,
+    -- 保养周期
+    maintenance_cycle MAINTENANCE_CYCLE NOT NULL,
+    -- 保养项目
+    maintenance_item  VARCHAR(45)       NOT NULL,
+    -- 备品名称
+    spare_part_name   VARCHAR(45)       NOT NULL,
+    -- 备品使用量
+    quantity          SMALLINT          NOT NULL
+);
+
+-- 添加项目费用数据表注释
+COMMENT ON TABLE spare_parts_management.item_cost IS '项目费用数据表';
+COMMENT ON COLUMN spare_parts_management.item_cost.device_number IS '设备编号';
+COMMENT ON COLUMN spare_parts_management.item_cost.maintenance_cycle IS '保养周期';
+COMMENT ON COLUMN spare_parts_management.item_cost.maintenance_item IS '保养项目';
+COMMENT ON COLUMN spare_parts_management.item_cost.spare_part_name IS '备品名称';
+COMMENT ON COLUMN spare_parts_management.item_cost.quantity IS '备品使用量';
+
+
