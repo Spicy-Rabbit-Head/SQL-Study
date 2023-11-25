@@ -292,6 +292,60 @@ COMMENT ON COLUMN maintenance_management.scheduling_data.member IS '成员';
 COMMENT ON COLUMN maintenance_management.scheduling_data.operation_time IS '作业时间';
 COMMENT ON COLUMN maintenance_management.scheduling_data.scheduling_status IS '排程状态';
 
+-- 创建模组排程数据
+CREATE TABLE IF NOT EXISTS maintenance_management.module_scheduling
+(
+    -- 主键id
+    id                    SERIAL PRIMARY KEY,
+    -- 模组名称
+    module_name           VARCHAR(45) NOT NULL,
+    -- 模组编号
+    module_number         VARCHAR(45) NOT NULL,
+    -- 保养数量
+    maintenance_quantity  SMALLINT    NOT NULL,
+    -- 模组型号
+    model_number          VARCHAR(80) NOT NULL,
+    -- 保养人员
+    maintenance_personnel VARCHAR(45),
+    -- 排定保养时间
+    scheduling_time       VARCHAR(45)
+);
+
+-- 添加模组排程数据表注释
+COMMENT ON TABLE maintenance_management.module_scheduling IS '模组排程数据表';
+COMMENT ON COLUMN maintenance_management.module_scheduling.id IS '主键id';
+COMMENT ON COLUMN maintenance_management.module_scheduling.module_name IS '模组名称';
+COMMENT ON COLUMN maintenance_management.module_scheduling.module_number IS '模组编号';
+COMMENT ON COLUMN maintenance_management.module_scheduling.maintenance_quantity IS '保养数量';
+COMMENT ON COLUMN maintenance_management.module_scheduling.model_number IS '模组型号';
+COMMENT ON COLUMN maintenance_management.module_scheduling.maintenance_personnel IS '成员';
+COMMENT ON COLUMN maintenance_management.module_scheduling.scheduling_time IS '排定保养时间';
+
+-- 创建非例行事项数据表
+CREATE TABLE IF NOT EXISTS maintenance_management.non_routine_matters_scheduling
+(
+    -- 主键id
+    id                  SERIAL PRIMARY KEY,
+    -- 事项名称
+    matters_name        VARCHAR(45)  NOT NULL,
+    -- 事项描述
+    matters_description VARCHAR(100) NOT NULL,
+    -- 成员
+    member              VARCHAR(45),
+    -- 验收佐证
+    acceptance_evidence VARCHAR(45),
+    -- 事项时间
+    matters_time        VARCHAR(45)
+);
+
+-- 添加非例行事项数据表注释
+COMMENT ON TABLE maintenance_management.non_routine_matters_scheduling IS '非例行事项数据表';
+COMMENT ON COLUMN maintenance_management.non_routine_matters_scheduling.id IS '主键id';
+COMMENT ON COLUMN maintenance_management.non_routine_matters_scheduling.matters_name IS '事项名称';
+COMMENT ON COLUMN maintenance_management.non_routine_matters_scheduling.matters_description IS '事项描述';
+COMMENT ON COLUMN maintenance_management.non_routine_matters_scheduling.member IS '成员';
+COMMENT ON COLUMN maintenance_management.non_routine_matters_scheduling.matters_time IS '事项时间';
+
 -- 创建资料管理架构
 CREATE SCHEMA IF NOT EXISTS information_management;
 
