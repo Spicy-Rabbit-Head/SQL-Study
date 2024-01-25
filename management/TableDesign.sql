@@ -13,10 +13,13 @@ CREATE SCHEMA IF NOT EXISTS user_management;
 
 -- 创建用户归属
 CREATE TYPE BELONG AS ENUM (
-    '领导',
-    '保养',
-    '换靶'
+    'LEADER',
+    'MAINTENANCE',
+    'CHANGE_TARGET'
     );
+
+-- 隐式转换
+-- CREATE CAST ( VARCHAR AS BELONG ) WITH INOUT AS IMPLICIT;
 
 -- 创建用户表
 CREATE TABLE IF NOT EXISTS user_management.user_data
@@ -46,6 +49,14 @@ COMMENT ON COLUMN user_management.user_data.name IS '姓名';
 COMMENT ON COLUMN user_management.user_data.belong IS '归属';
 COMMENT ON COLUMN user_management.user_data.email IS '邮箱';
 COMMENT ON COLUMN user_management.user_data.uuid IS '通用唯一识别码';
+
+-- 添加测试用户
+INSERT
+INTO
+    user_management.user_data
+    (username, password, name, belong)
+VALUES
+    ('text1', '$2a$10$r3EDy4dhh3QYoGNHPJu9PeSvmhJcamaKOY9I6Rxr6RTyCRY1wm8JS', '测试1', 'MAINTENANCE');
 
 -- 创建角色表
 CREATE TABLE IF NOT EXISTS user_management.role
@@ -105,8 +116,7 @@ INTO
     user_management.user_role_link
     (user_id, role_id)
 VALUES
-    (1, 1),
-    (15, 1);
+    (1, 1);
 
 -- 创建菜单权限表
 CREATE TABLE IF NOT EXISTS user_management.menu_permissions
@@ -603,4 +613,47 @@ COMMENT ON COLUMN spare_parts_management.item_cost.maintenance_item IS '保养�
 COMMENT ON COLUMN spare_parts_management.item_cost.spare_part_name IS '备品名称';
 COMMENT ON COLUMN spare_parts_management.item_cost.quantity IS '备品使用量';
 
+-- 创建表单管理架构
+CREATE SCHEMA IF NOT EXISTS form_management;
+
+-- 创建表单结构数据表
+CREATE TABLE IF NOT EXISTS form_management.form_structure
+(
+    -- 主键id
+    id           SERIAL PRIMARY KEY,
+    -- 表单名
+    form_name    VARCHAR(45)  NOT NULL,
+    -- 表单描述
+    form_desc    VARCHAR(100) NOT NULL,
+    -- 表单类型
+    form_type    VARCHAR(45)  NOT NULL,
+    -- 表单结构
+    form_content JSON         NOT NULL
+);
+
+-- 添加表单结构数据表注释
+COMMENT ON TABLE form_management.form_structure IS '表单结构数据表';
+COMMENT ON COLUMN form_management.form_structure.id IS '主键id';
+COMMENT ON COLUMN form_management.form_structure.form_name IS '表单名';
+COMMENT ON COLUMN form_management.form_structure.form_desc IS '表单描述';
+COMMENT ON COLUMN form_management.form_structure.form_type IS '表单类型';
+COMMENT ON COLUMN form_management.form_structure.form_content IS '表单结构';
+
+-- 创建字段管理架构
+CREATE SCHEMA IF NOT EXISTS field_management;
+
+-- 创建表格字段数据表
+CREATE TABLE IF NOT EXISTS field_management.table_field
+(
+    -- 主键id
+    id           SERIAL PRIMARY KEY,
+    -- 表单名
+    form_name    VARCHAR(45)  NOT NULL,
+    -- 表单描述
+    form_desc    VARCHAR(100) NOT NULL,
+    -- 表单类型
+    form_type    VARCHAR(45)  NOT NULL,
+    -- 表单结构
+    form_content JSON         NOT NULL
+);
 
