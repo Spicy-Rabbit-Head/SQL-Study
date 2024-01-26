@@ -613,6 +613,24 @@ COMMENT ON COLUMN spare_parts_management.item_cost.maintenance_item IS '保养�
 COMMENT ON COLUMN spare_parts_management.item_cost.spare_part_name IS '备品名称';
 COMMENT ON COLUMN spare_parts_management.item_cost.quantity IS '备品使用量';
 
+-- 机台备品费用视图
+CREATE VIEW spare_parts_management.device_spare_parts_cost
+AS
+SELECT
+    ic.device_number,
+    ic.maintenance_item,
+    ic.maintenance_cycle,
+    ic.spare_part_name,
+    spd.part_number,
+    ic.quantity,
+    spd.price,
+    ic.quantity * spd.price AS total_price
+FROM
+    spare_parts_management.item_cost AS ic
+    LEFT JOIN spare_parts_management.spare_parts_data AS spd
+    USING ( spare_part_name );
+
+
 -- 创建表单管理架构
 CREATE SCHEMA IF NOT EXISTS form_management;
 
