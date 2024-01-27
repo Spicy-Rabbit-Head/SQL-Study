@@ -1,3 +1,4 @@
+-- 机台信息
 INSERT
 INTO
     information_management.device_data
@@ -52,3 +53,8 @@ VALUES
      '运行中',
      TRUE,
      '2021-01-01 00:00:00'::TIMESTAMP);
+
+
+
+
+-- 保养项目

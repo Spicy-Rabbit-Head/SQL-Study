@@ -613,6 +613,42 @@ COMMENT ON COLUMN spare_parts_management.item_cost.maintenance_item IS '保养�
 COMMENT ON COLUMN spare_parts_management.item_cost.spare_part_name IS '备品名称';
 COMMENT ON COLUMN spare_parts_management.item_cost.quantity IS '备品使用量';
 
+-- 创建费用中转表
+CREATE TABLE IF NOT EXISTS spare_parts_management.cost_transfer
+(
+    -- 设备编号
+    device_number      VARCHAR(45)       NOT NULL,
+    -- 保养周期
+    maintenance_cycle  MAINTENANCE_CYCLE NOT NULL,
+    -- 保养项目
+    maintenance_item   VARCHAR(45)       NOT NULL,
+    -- 备品名称
+    spare_part_name    VARCHAR(45)       NOT NULL,
+    -- 备品使用量
+    quantity           SMALLINT          NOT NULL,
+    -- 价格
+    price              DECIMAL(10, 2)    NOT NULL,
+    -- 总价
+    total_price        DECIMAL(10, 2) GENERATED ALWAYS AS ( quantity * price ) STORED,
+    -- 实际使用量
+    actual_quantity    SMALLINT,
+    -- 实际总价
+    actual_total_price DECIMAL(10, 2) GENERATED ALWAYS AS ( actual_quantity * price ) STORED
+);
+
+
+-- 添加费用中转表注释
+COMMENT ON TABLE spare_parts_management.cost_transfer IS '费用中转表';
+COMMENT ON COLUMN spare_parts_management.cost_transfer.device_number IS '设备编号';
+COMMENT ON COLUMN spare_parts_management.cost_transfer.maintenance_cycle IS '保养周期';
+COMMENT ON COLUMN spare_parts_management.cost_transfer.maintenance_item IS '保养项目';
+COMMENT ON COLUMN spare_parts_management.cost_transfer.spare_part_name IS '备品名称';
+COMMENT ON COLUMN spare_parts_management.cost_transfer.quantity IS '备品使用量';
+COMMENT ON COLUMN spare_parts_management.cost_transfer.price IS '价格';
+COMMENT ON COLUMN spare_parts_management.cost_transfer.total_price IS '总价';
+COMMENT ON COLUMN spare_parts_management.cost_transfer.actual_quantity IS '实际使用量';
+COMMENT ON COLUMN spare_parts_management.cost_transfer.actual_total_price IS '实际总价';
+
 -- 机台备品费用视图
 CREATE VIEW spare_parts_management.device_spare_parts_cost
 AS
