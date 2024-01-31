@@ -162,8 +162,11 @@ VALUES
     ('保养相关', 'ScheduleOther', 2, '/schedule-other', 'maintenanceSchedule/ScheduleOther', NULL, '保養排程其他'),
     ('保养相关', 'MaintenancePreparation', 0, '/maintenance-preparation', NULL, NULL, '保养准备'),
     ('保养相关', 'PrepareSupplies', 5, '/prepare-supplies', 'maintenancePreparation/PrepareSupplies', NULL, '备品准备'),
+    ('保养相关', 'MaintenanceExecution', 0, '/maintenance-execution', NULL, NULL, '保养执行'),
+    ('保养相关', 'FillInFees', 7, '/fill-in-fees', 'maintenanceExecution/FillInFees', NULL, '填写费用'),
     ('资料相关', 'InformationManagement', 0, '/information-management', NULL, NULL, '资料管理'),
-    ('资料相关', 'DeviceData', 7, '/device-data', 'information-management/DeviceData', NULL, '设备数据');
+    ('资料相关', 'DeviceData', 9, '/device-data', 'informationManagement/DeviceData', NULL, '设备数据'),
+    ('资料相关', 'SparePartsData', 9, '/spare-parts-data', 'informationManagement/SparePartsData', NULL, '备品数据');
 
 
 -- 创建角色菜单权限外键表
@@ -203,7 +206,10 @@ VALUES
     (1, 5),
     (1, 6),
     (1, 7),
-    (1, 8);
+    (1, 8),
+    (1, 9),
+    (1, 10),
+    (1, 11);
 
 -- 创建操作权限表
 CREATE TABLE IF NOT EXISTS user_management.operation_permissions
@@ -301,6 +307,45 @@ COMMENT ON COLUMN maintenance_management.scheduling_data.person_in_charge IS '�
 COMMENT ON COLUMN maintenance_management.scheduling_data.member IS '成员';
 COMMENT ON COLUMN maintenance_management.scheduling_data.operation_time IS '作业时间';
 COMMENT ON COLUMN maintenance_management.scheduling_data.scheduling_status IS '排程状态';
+
+
+-- 排程归档
+CREATE TABLE IF NOT EXISTS maintenance_management.scheduling_archiving
+(
+    -- 车间
+    workshop               VARCHAR(45) NOT NULL,
+    -- 设备编号
+    equipment_number       VARCHAR(45) NOT NULL,
+    -- 设备型号
+    equipment_model_number VARCHAR(80) NOT NULL,
+    -- 设备名称
+    equipment_name         VARCHAR(45) NOT NULL,
+    -- 保养周期
+    maintenance_cycle      VARCHAR(45) NOT NULL,
+    -- 计划时间
+    plan_time              DATE        NOT NULL,
+    -- 排定时间
+    scheduling_time        VARCHAR(45),
+    -- 负责人
+    person_in_charge       VARCHAR(45),
+    -- 成员
+    member                 VARCHAR(45),
+    -- 作业时间
+    operation_time         DATE
+);
+
+-- 添加排程归档数据表注释
+COMMENT ON TABLE maintenance_management.scheduling_archiving IS '排程归档数据表';
+COMMENT ON COLUMN maintenance_management.scheduling_archiving.equipment_number IS '设备编号';
+COMMENT ON COLUMN maintenance_management.scheduling_archiving.equipment_model_number IS '设备型号';
+COMMENT ON COLUMN maintenance_management.scheduling_archiving.equipment_name IS '设备名称';
+COMMENT ON COLUMN maintenance_management.scheduling_archiving.maintenance_cycle IS '保养周期';
+COMMENT ON COLUMN maintenance_management.scheduling_archiving.plan_time IS '计划时间';
+COMMENT ON COLUMN maintenance_management.scheduling_archiving.scheduling_time IS '排定时间';
+COMMENT ON COLUMN maintenance_management.scheduling_archiving.person_in_charge IS '负责人';
+COMMENT ON COLUMN maintenance_management.scheduling_archiving.member IS '成员';
+COMMENT ON COLUMN maintenance_management.scheduling_archiving.operation_time IS '作业时间';
+
 
 -- 创建模组排程数据
 CREATE TABLE IF NOT EXISTS maintenance_management.module_scheduling
@@ -613,8 +658,8 @@ COMMENT ON COLUMN spare_parts_management.item_cost.maintenance_item IS '保养�
 COMMENT ON COLUMN spare_parts_management.item_cost.spare_part_name IS '备品名称';
 COMMENT ON COLUMN spare_parts_management.item_cost.quantity IS '备品使用量';
 
--- 创建费用中转表
-CREATE TABLE IF NOT EXISTS spare_parts_management.cost_transfer
+-- 创建机台表
+CREATE TABLE IF NOT EXISTS spare_parts_management.cost_statistics
 (
     -- 设备编号
     device_number      VARCHAR(45)       NOT NULL,
@@ -623,7 +668,7 @@ CREATE TABLE IF NOT EXISTS spare_parts_management.cost_transfer
     -- 保养项目
     maintenance_item   VARCHAR(45)       NOT NULL,
     -- 备品名称
-    spare_part_name    VARCHAR(45)       NOT NULL,
+    spare_part_name    VARCHAR(45),
     -- 备品使用量
     quantity           SMALLINT          NOT NULL,
     -- 价格
@@ -633,21 +678,27 @@ CREATE TABLE IF NOT EXISTS spare_parts_management.cost_transfer
     -- 实际使用量
     actual_quantity    SMALLINT,
     -- 实际总价
-    actual_total_price DECIMAL(10, 2) GENERATED ALWAYS AS ( actual_quantity * price ) STORED
+    actual_total_price DECIMAL(10, 2) GENERATED ALWAYS AS ( actual_quantity * price ) STORED,
+    -- 备注
+    remark             VARCHAR(100),
+    -- 写入时间
+    write_time         DATE              NOT NULL DEFAULT CURRENT_DATE
 );
 
 
 -- 添加费用中转表注释
-COMMENT ON TABLE spare_parts_management.cost_transfer IS '费用中转表';
-COMMENT ON COLUMN spare_parts_management.cost_transfer.device_number IS '设备编号';
-COMMENT ON COLUMN spare_parts_management.cost_transfer.maintenance_cycle IS '保养周期';
-COMMENT ON COLUMN spare_parts_management.cost_transfer.maintenance_item IS '保养项目';
-COMMENT ON COLUMN spare_parts_management.cost_transfer.spare_part_name IS '备品名称';
-COMMENT ON COLUMN spare_parts_management.cost_transfer.quantity IS '备品使用量';
-COMMENT ON COLUMN spare_parts_management.cost_transfer.price IS '价格';
-COMMENT ON COLUMN spare_parts_management.cost_transfer.total_price IS '总价';
-COMMENT ON COLUMN spare_parts_management.cost_transfer.actual_quantity IS '实际使用量';
-COMMENT ON COLUMN spare_parts_management.cost_transfer.actual_total_price IS '实际总价';
+COMMENT ON TABLE spare_parts_management.cost_statistics IS '费用中转表';
+COMMENT ON COLUMN spare_parts_management.cost_statistics.device_number IS '设备编号';
+COMMENT ON COLUMN spare_parts_management.cost_statistics.maintenance_cycle IS '保养周期';
+COMMENT ON COLUMN spare_parts_management.cost_statistics.maintenance_item IS '保养项目';
+COMMENT ON COLUMN spare_parts_management.cost_statistics.spare_part_name IS '备品名称';
+COMMENT ON COLUMN spare_parts_management.cost_statistics.quantity IS '备品使用量';
+COMMENT ON COLUMN spare_parts_management.cost_statistics.price IS '价格';
+COMMENT ON COLUMN spare_parts_management.cost_statistics.total_price IS '总价';
+COMMENT ON COLUMN spare_parts_management.cost_statistics.actual_quantity IS '实际使用量';
+COMMENT ON COLUMN spare_parts_management.cost_statistics.actual_total_price IS '实际总价';
+COMMENT ON COLUMN spare_parts_management.cost_statistics.remark IS '备注';
+COMMENT ON COLUMN spare_parts_management.cost_statistics.write_time IS '写入时间';
 
 -- 机台备品费用视图
 CREATE VIEW spare_parts_management.device_spare_parts_cost
@@ -657,6 +708,7 @@ SELECT
     ic.maintenance_item,
     ic.maintenance_cycle,
     ic.spare_part_name,
+    spd.image_link          AS image,
     spd.part_number,
     ic.quantity,
     spd.price,
